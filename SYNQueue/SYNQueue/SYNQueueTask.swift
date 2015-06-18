@@ -8,11 +8,12 @@
 
 import Foundation
 
-public typealias SYNTaskCallback = (NSError?, SYNQueueTask) -> Void
+public typealias SYNTaskCallback = (SYNQueueTask) -> Void
 public typealias JSONDictionary = [String: AnyObject?]
 
 @objc
 public class SYNQueueTask : NSOperation {
+    public weak var queue: SYNQueue?
     public let taskType: String
     public let data: [String: AnyObject]
     let dependencyStrs: [String]
@@ -26,10 +27,11 @@ public class SYNQueueTask : NSOperation {
     public override var executing:Bool { get { return _executing } set { _executing = newValue } }
     public override var finished:Bool { get { return _finished } set { _finished = newValue } }
     
-    public init(taskID: String, taskType: String, dependencyStrs: [String],
+    public init(queue:SYNQueue, taskID: String, taskType: String, dependencyStrs: [String],
         queuePriority: NSOperationQueuePriority, qualityOfService: NSQualityOfService,
         data: [String: AnyObject], created: NSDate, started: NSDate?, retries: Int)
     {
+        self.queue = queue
         self.taskType = taskType
         self.dependencyStrs = dependencyStrs
         self.data = data
@@ -44,7 +46,7 @@ public class SYNQueueTask : NSOperation {
         self.qualityOfService = qualityOfService
     }
     
-    public convenience init?(dictionary: JSONDictionary) {
+    public convenience init?(dictionary: JSONDictionary, queue:SYNQueue) {
         if  let taskID = dictionary["taskID"] as? String,
             let taskType = dictionary["taskType"] as? String,
             let dependencyStrs = dictionary["dependencies"] as? [String],
@@ -58,11 +60,11 @@ public class SYNQueueTask : NSOperation {
             let created = NSDate(dateString: createdStr) ?? NSDate()
             let started = (startedStr != nil) ? NSDate(dateString: startedStr!) : nil
             
-            self.init(taskID: taskID, taskType: taskType, dependencyStrs: dependencyStrs,
+            self.init(queue: queue, taskID: taskID, taskType: taskType, dependencyStrs: dependencyStrs,
                 queuePriority: queuePriority, qualityOfService: qualityOfService,
                 data: data, created: created, started: started, retries: retries)
         } else {
-            self.init(taskID: "", taskType: "", dependencyStrs: [],
+            self.init(queue: queue, taskID: "", taskType: "", dependencyStrs: [],
                 queuePriority: .VeryLow, qualityOfService: .Default,
                 data: [String: AnyObject](), created: NSDate(), started: NSDate(), retries: 0)
         }
@@ -103,5 +105,17 @@ public class SYNQueueTask : NSOperation {
         executing = true
         finished = false
         
+        queue?.runTask(self)
+    }
+    
+    public func completed(error: NSError?) {
+        if let error = error {
+            // TODO: retry? or
+            // print error and return
+            return
+        }
+        
+        finished = true
+        executing = false
     }
 }

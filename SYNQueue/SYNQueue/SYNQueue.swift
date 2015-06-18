@@ -9,16 +9,29 @@
 import Foundation
 
 public class SYNQueue : NSOperationQueue {
-    let taskHandler: SYNTaskCallback
+    //let taskHandler: SYNTaskCallback
+    var taskHandlers: [String: SYNTaskCallback] = [:]
     
-    public init(queueName: String, maxConcurrency: Int, taskHandler: SYNTaskCallback) {
-        self.taskHandler = taskHandler
+    public init(queueName: String, maxConcurrency: Int) {
         
         super.init()
         
-        self.name = queueName
+        self.name = queueName;
         self.maxConcurrentOperationCount = maxConcurrency
     }
+    
+    public func addTaskHandler(taskType: String, taskHandler:SYNTaskCallback) {
+        taskHandlers[taskType] = taskHandler
+    }
+    
+//    public init(queueName: String, maxConcurrency: Int, taskHandler: SYNTaskCallback) {
+//        //self.taskHandler = taskHandler
+//        
+//        super.init()
+//        
+//        self.name = queueName
+//        self.maxConcurrentOperationCount = maxConcurrency
+//    }
     
     //    public convenience init(dictionary: [String: AnyObject?]) {
     //        // FIXME:
@@ -36,5 +49,8 @@ public class SYNQueue : NSOperationQueue {
     
     func runTask(task:SYNQueueTask) {
         
+        if let handler = taskHandlers[task.taskType] {
+            handler(task)
+        }
     }
 }
