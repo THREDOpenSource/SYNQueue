@@ -11,31 +11,21 @@ import Foundation
 public class SYNQueue : NSOperationQueue {
     //let taskHandler: SYNTaskCallback
     var taskHandlers: [String: SYNTaskCallback] = [:]
+    let maxRetries: Int
     
-    public init(queueName: String, maxConcurrency: Int) {
+    public init(queueName: String, maxConcurrency: Int, maxRetries: Int) {
+        
+        self.maxRetries = maxRetries
         
         super.init()
         
-        self.name = queueName;
+        self.name = queueName
         self.maxConcurrentOperationCount = maxConcurrency
     }
     
     public func addTaskHandler(taskType: String, taskHandler:SYNTaskCallback) {
         taskHandlers[taskType] = taskHandler
     }
-    
-//    public init(queueName: String, maxConcurrency: Int, taskHandler: SYNTaskCallback) {
-//        //self.taskHandler = taskHandler
-//        
-//        super.init()
-//        
-//        self.name = queueName
-//        self.maxConcurrentOperationCount = maxConcurrency
-//    }
-    
-    //    public convenience init(dictionary: [String: AnyObject?]) {
-    //        // FIXME:
-    //    }
     
     override public func addOperation(op: NSOperation) {
         // FIXME: Serialization
