@@ -13,22 +13,24 @@ public typealias JSONDictionary = [String: AnyObject?]
 
 @objc
 public class SYNQueueTask : NSOperation {
-    public let queueName: String
+    public let taskType: String
     public let data: [String: AnyObject]
     let dependencyStrs: [String]
     let created: NSDate
     var started: NSDate?
     var retries: Int
+    var _executing: Bool = false
+    var _finished: Bool = false
     
     public override var asynchronous:Bool { return true }
-    public override var executing:Bool = false
-    public override var finished:Bool = false
+    public override var executing:Bool { get { return _executing } set { _executing = newValue } }
+    public override var finished:Bool { get { return _finished } set { _finished = newValue } }
     
-    public init(taskID: String, queueName: String, dependencyStrs: [String],
+    public init(taskID: String, taskType: String, dependencyStrs: [String],
         queuePriority: NSOperationQueuePriority, qualityOfService: NSQualityOfService,
         data: [String: AnyObject], created: NSDate, started: NSDate?, retries: Int)
     {
-        self.queueName = queueName
+        self.taskType = taskType
         self.dependencyStrs = dependencyStrs
         self.data = data
         self.created = created
@@ -44,7 +46,7 @@ public class SYNQueueTask : NSOperation {
     
     public convenience init?(dictionary: JSONDictionary) {
         if  let taskID = dictionary["taskID"] as? String,
-            let queueName = dictionary["queueName"] as? String,
+            let taskType = dictionary["taskType"] as? String,
             let dependencyStrs = dictionary["dependencies"] as? [String],
             let queuePriority = dictionary["queuePriority"] as? NSOperationQueuePriority,
             let qualityOfService = dictionary["qualityOfService"] as? NSQualityOfService,
@@ -56,11 +58,11 @@ public class SYNQueueTask : NSOperation {
             let created = NSDate(dateString: createdStr) ?? NSDate()
             let started = (startedStr != nil) ? NSDate(dateString: startedStr!) : nil
             
-            self.init(taskID: taskID, queueName: queueName, dependencyStrs: dependencyStrs,
+            self.init(taskID: taskID, taskType: taskType, dependencyStrs: dependencyStrs,
                 queuePriority: queuePriority, qualityOfService: qualityOfService,
                 data: data, created: created, started: started, retries: retries)
         } else {
-            self.init(taskID: "", queueName: "", dependencyStrs: [],
+            self.init(taskID: "", taskType: "", dependencyStrs: [],
                 queuePriority: .VeryLow, qualityOfService: .Default,
                 data: [String: AnyObject](), created: NSDate(), started: NSDate(), retries: 0)
         }
@@ -85,7 +87,7 @@ public class SYNQueueTask : NSOperation {
     public func toDictionary() -> [String: AnyObject?] {
         var dict = [String: AnyObject?]()
         dict["taskID"] = self.name
-        dict["queueName"] = self.queueName
+        dict["taskType"] = self.taskType
         dict["dependencies"] = self.dependencyStrs
         dict["queuePriority"] = self.queuePriority.rawValue
         dict["qualityOfService"] = self.qualityOfService.rawValue
