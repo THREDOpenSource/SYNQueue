@@ -14,7 +14,23 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let task = SYNQueueTask()
+        let queueName = ""
+        let queue = SYNQueue(queueName: queueName, maxConcurrency: 2) {
+            (err: NSError?, task: SYNQueueTask) in
+            if let err = err {
+                print("Queue error: \(err)")
+                return
+            }
+            
+            let taskType = task.data["type"] {
+                switch taskType {
+                    
+                }
+            }
+            task.completed(nil)
+            
+            print("Dequeued \(task.name) on queue \(queueName)")
+        }
     }
 
     override func didReceiveMemoryWarning() {

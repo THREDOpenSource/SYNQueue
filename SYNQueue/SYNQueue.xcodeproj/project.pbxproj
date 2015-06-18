@@ -11,6 +11,9 @@
 		9F6202371B333AAF0026CE2C /* SYNQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F62022B1B333AAF0026CE2C /* SYNQueue.framework */; };
 		9F62023E1B333AAF0026CE2C /* SYNQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F62023D1B333AAF0026CE2C /* SYNQueueTests.swift */; };
 		9FD63F871B333B81001BD09A /* SYNQueueTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63F861B333B81001BD09A /* SYNQueueTask.swift */; };
+		9FD63FBD1B3342C6001BD09A /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63FBC1B3342C6001BD09A /* Utils.swift */; };
+		9FD63FBF1B334316001BD09A /* NSDate+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63FBE1B334316001BD09A /* NSDate+Utils.swift */; };
+		9FD63FC11B335579001BD09A /* SYNQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63FC01B335579001BD09A /* SYNQueue.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +34,9 @@
 		9F62023C1B333AAF0026CE2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9F62023D1B333AAF0026CE2C /* SYNQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SYNQueueTests.swift; sourceTree = "<group>"; };
 		9FD63F861B333B81001BD09A /* SYNQueueTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SYNQueueTask.swift; sourceTree = "<group>"; };
+		9FD63FBC1B3342C6001BD09A /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		9FD63FBE1B334316001BD09A /* NSDate+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+Utils.swift"; sourceTree = "<group>"; };
+		9FD63FC01B335579001BD09A /* SYNQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SYNQueue.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,9 +79,12 @@
 		9F62022D1B333AAF0026CE2C /* SYNQueue */ = {
 			isa = PBXGroup;
 			children = (
-				9F6202301B333AAF0026CE2C /* SYNQueue.h */,
 				9F62022E1B333AAF0026CE2C /* Supporting Files */,
+				9FD63FBE1B334316001BD09A /* NSDate+Utils.swift */,
+				9F6202301B333AAF0026CE2C /* SYNQueue.h */,
+				9FD63FC01B335579001BD09A /* SYNQueue.swift */,
 				9FD63F861B333B81001BD09A /* SYNQueueTask.swift */,
+				9FD63FBC1B3342C6001BD09A /* Utils.swift */,
 			);
 			path = SYNQueue;
 			sourceTree = "<group>";
@@ -214,7 +223,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FD63FC11B335579001BD09A /* SYNQueue.swift in Sources */,
 				9FD63F871B333B81001BD09A /* SYNQueueTask.swift in Sources */,
+				9FD63FBF1B334316001BD09A /* NSDate+Utils.swift in Sources */,
+				9FD63FBD1B3342C6001BD09A /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
