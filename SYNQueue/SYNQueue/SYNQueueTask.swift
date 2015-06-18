@@ -31,9 +31,11 @@ public class SYNQueueTask : NSOperation {
     public override var executing:Bool { get { return _executing } set { _executing = newValue } }
     public override var finished:Bool { get { return _finished } set { _finished = newValue } }
     
-    public init(queue:SYNQueue, taskID: String, taskType: String, dependencyStrs: [String],
-        queuePriority: NSOperationQueuePriority, qualityOfService: NSQualityOfService,
-        data: [String: AnyObject], created: NSDate, started: NSDate?, retries: Int)
+    public init(queue:SYNQueue, taskID: String, taskType: String,
+        dependencyStrs: [String], data: [String: AnyObject],
+        created: NSDate = NSDate(), started: NSDate? = nil, retries: Int = 0,
+        queuePriority: NSOperationQueuePriority = .Normal,
+        qualityOfService: NSQualityOfService = .Default)
     {
         self.queue = queue
         self.taskType = taskType
@@ -64,13 +66,12 @@ public class SYNQueueTask : NSOperation {
             let created = NSDate(dateString: createdStr) ?? NSDate()
             let started = (startedStr != nil) ? NSDate(dateString: startedStr!) : nil
             
-            self.init(queue: queue, taskID: taskID, taskType: taskType, dependencyStrs: dependencyStrs,
-                queuePriority: queuePriority, qualityOfService: qualityOfService,
-                data: data, created: created, started: started, retries: retries)
+            self.init(queue: queue, taskID: taskID, taskType: taskType,
+                dependencyStrs: dependencyStrs, data: data, created: created,
+                started: started, retries: retries, queuePriority: queuePriority,
+                qualityOfService: qualityOfService)
         } else {
-            self.init(queue: queue, taskID: "", taskType: "", dependencyStrs: [],
-                queuePriority: .VeryLow, qualityOfService: .Default,
-                data: [String: AnyObject](), created: NSDate(), started: NSDate(), retries: 0)
+            self.init(queue: queue, taskID: "", taskType: "", dependencyStrs: [], data: [:])
         }
         
         return nil

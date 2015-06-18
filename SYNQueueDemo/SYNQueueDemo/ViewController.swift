@@ -10,40 +10,23 @@ import UIKit
 import SYNQueue
 
 class ViewController: UIViewController {
-
+    @IBOutlet weak var collectionView: UICollectionView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let queueName = ""
-//        let queue = SYNQueue(queueName: queueName, maxConcurrency: 2) {
-//            (err: NSError?, task: SYNQueueTask) in
-//            if let err = err {
-//                print("Queue error: \(err)")
-//                return
-//            }
-//            
-//            let taskType = task.data["type"] {
-//                switch taskType {
-//                    
-//                }
-//            }
-//            task.completed(nil)
-//            
-//            print("Dequeued \(task.name) on queue \(queueName)")
-//        }
-        
+        let queueName = "myQueue"
         let queue = SYNQueue(queueName: queueName, maxConcurrency: 2, maxRetries: 10)
         
-        queue.addTaskHandler("image") {
-            (task) in
-            
+        queue.addTaskHandler("cellTask") { (task) in
             // Do the task
             
             // Complete the task
             task.completed(NSError(domain: "Queue", code: -1, userInfo: nil))
         }
         
-        let task = SYNQueueTask(queue: queue, taskID: "234", taskType: "image", dependencyStrs: ["1"], queuePriority: .Normal, qualityOfService: .Default, data: [:], created: NSDate(), started: nil, retries: 0)
+        let task = SYNQueueTask(queue: queue, taskID: "a", taskType: "cellTask",
+            dependencyStrs: [], data: [:])
         
         queue.addOperation(task)
     }
@@ -52,6 +35,12 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
+    
+    @IBAction func addTapped(sender: UIButton) {
+        
+    }
+    
+    @IBAction func removeTapped(sender: UIButton) {
+        
+    }
 }
