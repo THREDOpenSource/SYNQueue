@@ -32,7 +32,7 @@ class ViewController: UIViewController {
 //            print("Dequeued \(task.name) on queue \(queueName)")
 //        }
         
-        let queue = SYNQueue(queueName: queueName, maxConcurrency: 2)
+        let queue = SYNQueue(queueName: queueName, maxConcurrency: 2, maxRetries:3)
         
         queue.addTaskHandler("image") {
             (task) in
