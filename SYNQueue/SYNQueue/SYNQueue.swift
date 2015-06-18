@@ -9,12 +9,10 @@
 import Foundation
 
 public class SYNQueue : NSOperationQueue {
-    //let taskHandler: SYNTaskCallback
+    public let maxRetries: Int
     var taskHandlers: [String: SYNTaskCallback] = [:]
-    let maxRetries: Int
     
     public init(queueName: String, maxConcurrency: Int, maxRetries: Int) {
-        
         self.maxRetries = maxRetries
         
         super.init()
@@ -42,5 +40,9 @@ public class SYNQueue : NSOperationQueue {
         if let handler = taskHandlers[task.taskType] {
             handler(task)
         }
+    }
+    
+    func taskComplete(task: SYNQueueTask) {
+        
     }
 }

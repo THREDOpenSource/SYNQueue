@@ -13,11 +13,15 @@ public typealias JSONDictionary = [String: AnyObject?]
 
 @objc
 public class SYNQueueTask : NSOperation {
+    static let MIN_RETRY_DELAY = 0.2
+    static let MAX_RETRY_DELAY = 60.0
+    
     public weak var queue: SYNQueue?
     public let taskType: String
     public let data: [String: AnyObject]
+    public let created: NSDate
+    
     let dependencyStrs: [String]
-    let created: NSDate
     var started: NSDate?
     var retries: Int
     var _executing: Bool = false
@@ -105,17 +109,39 @@ public class SYNQueueTask : NSOperation {
         executing = true
         finished = false
         
+        run()
+    }
+    
+    public func run() {
         queue?.runTask(self)
     }
     
     public func completed(error: NSError?) {
         if let error = error {
-            // TODO: retry? or
-            // print error and return
+            println("Task \(name) failed with error: \(error)")
+            
+            // Check if we've exceeded the max allowed retries
+            if ++retries >= queue?.maxRetries {
+                println("Max retries exceeded for task \(name)")
+                executing = false
+                finished = true
+                return
+            }
+            
+            // Wait a bit (exponential backoff) and retry this task
+            let exp = Double(min(queue?.maxRetries ?? 0, retries))
+            let seconds = UInt64(min(SYNQueueTask.MAX_RETRY_DELAY, SYNQueueTask.MIN_RETRY_DELAY * pow(2.0, exp - 1)))
+            let delta = dispatch_time(DISPATCH_TIME_NOW, Int64(seconds * NSEC_PER_SEC))
+            dispatch_after(delta, dispatch_get_main_queue()) {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.run()
+                }
+            }
+            
             return
         }
         
-        finished = true
         executing = false
+        finished = true
     }
 }
