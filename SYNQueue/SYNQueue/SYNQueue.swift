@@ -8,8 +8,29 @@
 
 import Foundation
 
-public protocol SYNQueueSerializationProvider {
+public enum LogLevel: Int {
+    case Trace   = 0
+    case Debug   = 1
+    case Info    = 2
+    case Warning = 3
+    case Error   = 4
     
+    public func toString() -> String {
+        switch (self) {
+            case .Trace:   return "Trace"
+            case .Debug:   return "Debug"
+            case .Info:    return "Info"
+            case .Warning: return "Warning"
+            case .Error:   return "Error"
+        }
+    }
+}
+
+public protocol SYNQueueLogProvider {
+    func log(level: LogLevel, _ msg: String)
+}
+
+public protocol SYNQueueSerializationProvider {
     func serializeTask(task: SYNQueueTask)
     func deserializeTasksWithQueue(queue: SYNQueue) -> Array<SYNQueueTask>
     func removeTask(task: SYNQueueTask)
@@ -17,15 +38,19 @@ public protocol SYNQueueSerializationProvider {
 
 public class SYNQueue : NSOperationQueue {
     public let maxRetries: Int
-    public let serializationProvider: SYNQueueSerializationProvider?
+    
+    let serializationProvider: SYNQueueSerializationProvider?
+    let logProvider: SYNQueueLogProvider?
     var taskHandlers: [String: SYNTaskCallback] = [:]
     let completionBlock: SYNTaskCallback?
     
     public init(queueName: String, maxConcurrency: Int, maxRetries: Int,
+        logProvider: SYNQueueLogProvider?,
         serializationProvider: SYNQueueSerializationProvider?,
         completionBlock: SYNTaskCallback?)
     {
         self.maxRetries = maxRetries
+        self.logProvider = logProvider
         self.serializationProvider = serializationProvider
         self.completionBlock = completionBlock
         
@@ -54,7 +79,7 @@ public class SYNQueue : NSOperationQueue {
         if let handler = taskHandlers[task.taskType] {
             handler(task)
         } else {
-            println("No handler registered for task \(task.taskID)")
+            log(.Warning, "No handler registered for task \(task.taskID)")
             task.cancel()
         }
     }
@@ -69,5 +94,9 @@ public class SYNQueue : NSOperationQueue {
                 sp.removeTask(task)
             }
         }
+    }
+    
+    func log(level: LogLevel, _ msg: String) {
+        logProvider?.log(level, msg)
     }
 }

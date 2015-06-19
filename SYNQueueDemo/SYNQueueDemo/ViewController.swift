@@ -9,7 +9,7 @@
 import UIKit
 import SYNQueue
 
-class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, SYNQueueLogProvider {
     @IBOutlet weak var collectionView: UICollectionView!
     
     var queue: SYNQueue?
@@ -19,7 +19,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         super.viewDidLoad()
         
         queue = SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 3,
-            serializationProvider: NSUserDefaultsSerializer(), completionBlock: taskComplete)
+            logProvider: self, serializationProvider: NSUserDefaultsSerializer(),
+            completionBlock: taskComplete)
         queue!.addTaskHandler("cellTask", taskHandler: taskHandler)
     }
     
@@ -36,7 +37,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     func taskHandler(task: SYNQueueTask) {
         // NOTE: Tasks are not actually handled here like usual since task
         // completion in this example is based on user interaction
-        Utils.print("Running task \(task.taskID)")
+        log(.Info, "Running task \(task.taskID)")
         
         // Set task completion after 5 seconds
         Utils.runOnMainThreadAfterDelay(5, callback: { () -> () in
@@ -55,8 +56,14 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     func taskComplete(task: SYNQueueTask) {
-        Utils.print("taskComplete(\(task.taskID))")
+        log(.Info, "taskComplete(\(task.taskID))")
         Utils.runOnMainThread { self.collectionView.reloadData() }
+    }
+    
+    // MARK: - SYNQueueLogProvider Delegates
+    
+    func log(level: LogLevel, _ msg: String) {
+        Utils.print("[\(level.toString().uppercaseString)] \(msg)")
     }
     
     // MARK: - UICollectionView Delegates
@@ -77,14 +84,13 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         if let task = queue!.operations[indexPath.item] as? SYNQueueTask {
             cell.task = task
             cell.nameLabel.text = "task \(task.taskID)"
-            cell.succeedButton.enabled = false // disable because completion is automatic with delay
             if task.executing {
                 cell.backgroundColor = UIColor.blueColor()
                 cell.failButton.enabled = true
-                //cell.succeedButton.enabled = true
+                cell.succeedButton.enabled = true
             } else {
                 cell.backgroundColor = UIColor.grayColor()
-                //cell.succeedButton.enabled = false
+                cell.succeedButton.enabled = false
                 cell.failButton.enabled = false
             }
         }
@@ -104,7 +110,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     @IBAction func removeTapped(sender: UIButton) {
         // Find the first task in the list
         if let task = queue!.operations.first as? SYNQueueTask {
-            Utils.print("Removing task \(task.taskID)")
+            log(.Info, "Removing task \(task.taskID)")
             task.cancel()
             collectionView.reloadData()
         }

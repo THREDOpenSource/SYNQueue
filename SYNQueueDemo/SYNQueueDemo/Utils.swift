@@ -15,7 +15,8 @@ class Utils {
     private static var printQueue: SYNQueue = {
         dispatch_once(&once) {
             let queue = SYNQueue(queueName: "printQueue", maxConcurrency: 1,
-                maxRetries: 0, serializationProvider: nil, completionBlock: nil)
+                maxRetries: 0, logProvider: nil, serializationProvider: nil,
+                completionBlock: nil)
             
             queue.addTaskHandler("print", taskHandler: {
                 (task: SYNQueueTask) in

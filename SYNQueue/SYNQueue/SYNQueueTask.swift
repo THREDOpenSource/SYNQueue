@@ -103,7 +103,7 @@ public class SYNQueueTask : NSOperation {
                 self.addDependency(task)
             } else {
                 let name = self.name ?? "(unknown)"
-                println("Discarding missing dependency \(taskID) from \(name)")
+                self.queue?.log(.Warning, "Discarding missing dependency \(taskID) from \(name)")
             }
         }
     }
@@ -133,7 +133,7 @@ public class SYNQueueTask : NSOperation {
     public override func cancel() {
         super.cancel()
         
-        println("Canceled task \(taskID)")
+        queue?.log(.Debug, "Canceled task \(taskID)")
         markFinished()
     }
     
@@ -151,16 +151,16 @@ public class SYNQueueTask : NSOperation {
         // Check to make sure we're even executing, if not
         // just ignore the completed call
         if (!executing) {
-            println("Completion called on task \(taskID) when task was not even executing")
+            queue?.log(.Debug, "Completion called on already completed task \(taskID)")
             return
         }
         
         if let error = error {
-            println("Task \(taskID) failed with error: \(error)")
+            queue?.log(.Warning, "Task \(taskID) failed with error: \(error)")
             
             // Check if we've exceeded the max allowed retries
             if ++retries >= queue?.maxRetries {
-                println("Max retries exceeded for task \(taskID)")
+                queue?.log(.Error, "Max retries exceeded for task \(taskID)")
                 markFinished()
                 return
             }
@@ -169,10 +169,10 @@ public class SYNQueueTask : NSOperation {
             let exp = Double(min(queue?.maxRetries ?? 0, retries))
             let seconds:NSTimeInterval = min(SYNQueueTask.MAX_RETRY_DELAY, SYNQueueTask.MIN_RETRY_DELAY * pow(2.0, exp - 1))
             
-            println("Waiting \(seconds) seconds to retry task \(taskID)")
+            queue?.log(.Debug, "Waiting \(seconds) seconds to retry task \(taskID)")
             Utils.runInBackgroundAfter(seconds) { self.run() }
         } else {
-            println("Task \(taskID) completed")
+            queue?.log(.Debug, "Task \(taskID) completed")
             markFinished()
         }
     }
