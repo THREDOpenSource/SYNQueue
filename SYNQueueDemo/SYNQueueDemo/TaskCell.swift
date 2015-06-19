@@ -12,6 +12,7 @@ import SYNQueue
 class TaskCell : UICollectionViewCell {
     @IBOutlet weak var succeedButton: UIButton!
     @IBOutlet weak var failButton: UIButton!
+    @IBOutlet weak var nameLabel: UILabel!
     
     weak var task: SYNQueueTask? = nil
     

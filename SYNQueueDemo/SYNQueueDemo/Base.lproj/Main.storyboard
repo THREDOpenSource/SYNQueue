@@ -56,7 +56,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V2S-qr-0x0">
-                                                    <rect key="frame" x="154" y="8" width="130" height="30"/>
+                                                    <rect key="frame" x="170.5" y="8" width="113" height="30"/>
                                                     <animations/>
                                                     <color key="backgroundColor" red="0.67450982332229614" green="0.25490197539329529" blue="0.25882354378700256" alpha="1" colorSpace="calibratedRGB"/>
                                                     <state key="normal" title="Fail">
@@ -68,7 +68,7 @@
                                                     </connections>
                                                 </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ohO-Ha-Frn">
-                                                    <rect key="frame" x="16" y="8" width="130" height="30"/>
+                                                    <rect key="frame" x="49" y="8" width="113" height="30"/>
                                                     <animations/>
                                                     <color key="backgroundColor" red="0.56470590829849243" green="0.66274511814117432" blue="0.3490196168422699" alpha="1" colorSpace="calibratedRGB"/>
                                                     <constraints>
@@ -82,21 +82,33 @@
                                                         <action selector="succeedTapped:" destination="HgQ-Rq-FCj" eventType="touchUpInside" id="off-Pa-igd"/>
                                                     </connections>
                                                 </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w0F-YX-WcE">
+                                                    <rect key="frame" x="8" y="17" width="33.5" height="16"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <animations/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <animations/>
+                                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstItem="V2S-qr-0x0" firstAttribute="top" secondItem="HgQ-Rq-FCj" secondAttribute="topMargin" id="1mJ-M1-fbZ"/>
-                                            <constraint firstItem="ohO-Ha-Frn" firstAttribute="leading" secondItem="HgQ-Rq-FCj" secondAttribute="leadingMargin" constant="8" id="2CE-It-cn4"/>
-                                            <constraint firstItem="ohO-Ha-Frn" firstAttribute="top" secondItem="HgQ-Rq-FCj" secondAttribute="topMargin" id="8f7-qG-Nyh"/>
                                             <constraint firstItem="V2S-qr-0x0" firstAttribute="width" secondItem="ohO-Ha-Frn" secondAttribute="width" id="BhY-lm-FVQ"/>
                                             <constraint firstAttribute="trailingMargin" secondItem="V2S-qr-0x0" secondAttribute="trailing" constant="8" id="Czi-An-L34"/>
                                             <constraint firstItem="V2S-qr-0x0" firstAttribute="leading" secondItem="ohO-Ha-Frn" secondAttribute="trailing" constant="8" id="Day-Ur-dGV"/>
+                                            <constraint firstItem="w0F-YX-WcE" firstAttribute="leading" secondItem="HgQ-Rq-FCj" secondAttribute="leadingMargin" id="KXj-ac-t5L"/>
+                                            <constraint firstAttribute="centerY" secondItem="w0F-YX-WcE" secondAttribute="centerY" id="Kz1-CX-5rm"/>
+                                            <constraint firstItem="ohO-Ha-Frn" firstAttribute="centerY" secondItem="w0F-YX-WcE" secondAttribute="centerY" constant="-2.25" id="O4s-K9-IEx"/>
+                                            <constraint firstItem="ohO-Ha-Frn" firstAttribute="leading" secondItem="w0F-YX-WcE" secondAttribute="trailing" constant="8" id="TqU-ds-5zV"/>
+                                            <constraint firstItem="w0F-YX-WcE" firstAttribute="centerY" secondItem="V2S-qr-0x0" secondAttribute="centerY" constant="2.25" id="kCE-PV-zna"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="failButton" destination="V2S-qr-0x0" id="pmC-73-tDN"/>
+                                            <outlet property="nameLabel" destination="w0F-YX-WcE" id="u2H-25-E3s"/>
                                             <outlet property="succeedButton" destination="ohO-Ha-Frn" id="dll-V6-lZU"/>
                                         </connections>
                                     </collectionViewCell>

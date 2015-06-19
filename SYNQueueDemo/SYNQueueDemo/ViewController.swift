@@ -71,6 +71,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         
         if let task = queue!.operations[indexPath.item] as? SYNQueueTask {
             cell.task = task
+            cell.nameLabel.text = "task \(task.taskID)"
             if task.executing {
                 cell.backgroundColor = UIColor.blueColor()
                 cell.failButton.enabled = true
