@@ -17,12 +17,12 @@ public protocol SYNQueueSerializationProvider {
 
 public class SYNQueue : NSOperationQueue {
     public let maxRetries: Int
-    public let serializationProvider: SYNQueueSerializationProvider
+    public let serializationProvider: SYNQueueSerializationProvider?
     var taskHandlers: [String: SYNTaskCallback] = [:]
     let completionBlock: SYNTaskCallback?
     
     public init(queueName: String, maxConcurrency: Int, maxRetries: Int,
-        serializationProvider: SYNQueueSerializationProvider,
+        serializationProvider: SYNQueueSerializationProvider?,
         completionBlock: SYNTaskCallback?)
     {
         self.maxRetries = maxRetries
@@ -40,10 +40,9 @@ public class SYNQueue : NSOperationQueue {
     }
     
     override public func addOperation(op: NSOperation) {
-        if let op = op as? SYNQueueTask {
-            serializationProvider.serializeTask(op)
-        } else {
-            println("Could not serialize operation because operation was not a SYNQueueTask instance")
+        if  let op = op as? SYNQueueTask,
+            let sp = serializationProvider {
+            sp.serializeTask(op)
         }
         
         op.completionBlock = { self.taskComplete(op) }
@@ -66,7 +65,9 @@ public class SYNQueue : NSOperationQueue {
                 handler(task)
             }
             
-            serializationProvider.removeTask(task)
+            if let sp = serializationProvider {
+                sp.removeTask(task)
+            }
         }
     }
 }
