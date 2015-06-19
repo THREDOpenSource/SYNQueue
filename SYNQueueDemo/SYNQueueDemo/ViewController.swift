@@ -12,14 +12,15 @@ import SYNQueue
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var collectionView: UICollectionView!
     
-    let queue = SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 5, serializationProvider: NSUserDefaultsSerializer())
-    var tasks = [SYNQueueTask]()
+    var queue: SYNQueue?
     var nextTaskID = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        queue.addTaskHandler("cellTask", taskHandler: taskHandler)
+        queue = SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 3,
+            serializationProvider: NSUserDefaultsSerializer(), completionBlock: taskComplete)
+        queue!.addTaskHandler("cellTask", taskHandler: taskHandler)
     }
     
     override func viewDidLayoutSubviews() {
@@ -33,24 +34,53 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     func taskHandler(task: SYNQueueTask) {
-        // Do the task
+        // NOTE: Tasks are not actually handled here like usual since task
+        // completion in this example is based on user interaction
+        println("Running task \(task.taskID)")
         
-        // Complete the task
-        task.completed(NSError(domain: "Queue", code: -1, userInfo: nil))
+        if  let queue = queue,
+            let index = Utils.findIndex(queue.operations as! [NSOperation], valueToFind: task)
+        {
+            // Redraw this task to show it as active
+            Utils.runOnMainThread {
+                let path = NSIndexPath(forItem: index, inSection: 0)
+                self.collectionView.reloadData()
+            }
+        }
+    }
+    
+    func taskComplete(task: SYNQueueTask) {
+        println("taskComplete(\(task.taskID))")
+        Utils.runOnMainThread { self.collectionView.reloadData() }
     }
     
     // MARK: - UICollectionView Delegates
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return tasks.count
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection
+        section: Int) -> Int
+    {
+        return queue!.operationCount
     }
     
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let task = tasks[indexPath.item]
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("TaskCell", forIndexPath: indexPath) as! TaskCell
-
-        cell.taskID = tasks[indexPath.item].name
-        cell.backgroundColor = task.executing ? UIColor.blueColor() : UIColor.grayColor()
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath
+        indexPath: NSIndexPath) -> UICollectionViewCell
+    {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(
+            "TaskCell", forIndexPath: indexPath) as! TaskCell
+        cell.backgroundColor = UIColor.redColor()
+        
+        if let task = queue!.operations[indexPath.item] as? SYNQueueTask {
+            cell.task = task
+            if task.executing {
+                cell.backgroundColor = UIColor.blueColor()
+                cell.failButton.enabled = true
+                cell.succeedButton.enabled = true
+            } else {
+                cell.backgroundColor = UIColor.grayColor()
+                cell.succeedButton.enabled = false
+                cell.failButton.enabled = false
+            }
+        }
         
         return cell
     }
@@ -58,21 +88,19 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     // MARK: - IBActions
     
     @IBAction func addTapped(sender: UIButton) {
-        let task = SYNQueueTask(queue: queue, taskID: String(nextTaskID++), taskType: "cellTask",
-            dependencyStrs: [], data: [:])
-        tasks.append(task)
+        let task = SYNQueueTask(queue: queue!, taskID: String(nextTaskID++),
+            taskType: "cellTask", dependencyStrs: [], data: [:])
         collectionView.reloadData()
-        queue.addOperation(task)
+        queue!.addOperation(task)
     }
     
     @IBAction func removeTapped(sender: UIButton) {
         // Find the first task in the list
-        if let task = tasks.first {
+        if let task = queue!.operations.first as? SYNQueueTask {
+            println("Removing task \(task.taskID)")
+            
             task.cancel()
-            tasks.removeAtIndex(0)
             collectionView.reloadData()
         }
     }
-    
-    
 }

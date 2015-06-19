@@ -30,8 +30,23 @@ public class SYNQueueTask : NSOperation {
     
     public override var name:String? { get { return taskID } set { } }
     public override var asynchronous:Bool { return true }
-    public override var executing:Bool { get { return _executing } set { _executing = newValue } }
-    public override var finished:Bool { get { return _finished } set { _finished = newValue } }
+    
+    public override var executing: Bool {
+        get { return _executing }
+        set {
+            willChangeValueForKey("isExecuting")
+            _executing = newValue
+            didChangeValueForKey("isExecuting")
+        }
+    }
+    public override var finished: Bool {
+        get { return _finished }
+        set {
+            willChangeValueForKey("isFinished")
+            _finished = newValue
+            didChangeValueForKey("isFinished")
+        }
+    }
     
     public init(queue:SYNQueue, taskID: String, taskType: String,
         dependencyStrs: [String], data: [String: AnyObject],
@@ -109,13 +124,13 @@ public class SYNQueueTask : NSOperation {
     }
     
     override public func start() {
-        executing = true
-        finished = false
+        super.start()
         
+        executing = true
         run()
     }
     
-    public func run() {
+    func run() {
         queue?.runTask(self)
     }
     
@@ -126,29 +141,24 @@ public class SYNQueueTask : NSOperation {
             // Check if we've exceeded the max allowed retries
             if ++retries >= queue?.maxRetries {
                 println("Max retries exceeded for task \(taskID)")
-                executing = false
-                finished = true
-                
-                // Will trigger the queue to remove the persisted task
-                queue?.taskComplete(self)
-                
+                markFinished()
                 return
             }
             
             // Wait a bit (exponential backoff) and retry this task
             let exp = Double(min(queue?.maxRetries ?? 0, retries))
-            let seconds = UInt64(min(SYNQueueTask.MAX_RETRY_DELAY, SYNQueueTask.MIN_RETRY_DELAY * pow(2.0, exp - 1)))
-            let delta = dispatch_time(DISPATCH_TIME_NOW, Int64(seconds * NSEC_PER_SEC))
-            dispatch_after(delta, dispatch_get_main_queue()) {
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.run()
-                }
-            }
+            let seconds:NSTimeInterval = min(SYNQueueTask.MAX_RETRY_DELAY, SYNQueueTask.MIN_RETRY_DELAY * pow(2.0, exp - 1))
             
-            return
+            println("Waiting \(seconds) seconds to retry task \(taskID)")
+            Utils.runInBackgroundAfter(seconds, callback: { self.run() })
+        } else {
+            println("Task \(taskID) completed")
+            markFinished()
         }
-        
-        executing = false
+    }
+    
+    func markFinished() {
         finished = true
+        executing = false
     }
 }

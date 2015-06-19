@@ -95,6 +95,10 @@
                                             <constraint firstAttribute="trailingMargin" secondItem="V2S-qr-0x0" secondAttribute="trailing" constant="8" id="Czi-An-L34"/>
                                             <constraint firstItem="V2S-qr-0x0" firstAttribute="leading" secondItem="ohO-Ha-Frn" secondAttribute="trailing" constant="8" id="Day-Ur-dGV"/>
                                         </constraints>
+                                        <connections>
+                                            <outlet property="failButton" destination="V2S-qr-0x0" id="pmC-73-tDN"/>
+                                            <outlet property="succeedButton" destination="ohO-Ha-Frn" id="dll-V6-lZU"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                                 <connections>

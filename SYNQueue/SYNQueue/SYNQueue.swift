@@ -19,10 +19,15 @@ public class SYNQueue : NSOperationQueue {
     public let maxRetries: Int
     public let serializationProvider: SYNQueueSerializationProvider
     var taskHandlers: [String: SYNTaskCallback] = [:]
+    let completionBlock: SYNTaskCallback?
     
-    public init(queueName: String, maxConcurrency: Int, maxRetries: Int, serializationProvider: SYNQueueSerializationProvider) {
+    public init(queueName: String, maxConcurrency: Int, maxRetries: Int,
+        serializationProvider: SYNQueueSerializationProvider,
+        completionBlock: SYNTaskCallback?)
+    {
         self.maxRetries = maxRetries
         self.serializationProvider = serializationProvider
+        self.completionBlock = completionBlock
         
         super.init()
         
@@ -35,29 +40,30 @@ public class SYNQueue : NSOperationQueue {
     }
     
     override public func addOperation(op: NSOperation) {
-        
         if let op = op as? SYNQueueTask {
             serializationProvider.serializeTask(op)
         } else {
             print("Could not serialize operation because operation was not a SYNQueueTask instance")
         }
-
+        
+        op.completionBlock = { self.taskComplete(op) }
+        
         super.addOperation(op)
     }
     
-    public func toDictionary() -> [String: AnyObject?] {
-        return [:]
-    }
-    
     func runTask(task:SYNQueueTask) {
-        
         if let handler = taskHandlers[task.taskType] {
             handler(task)
         }
     }
     
-    func taskComplete(task: SYNQueueTask) {
-        
-        serializationProvider.removeTask(task)
+    func taskComplete(op: NSOperation) {
+        if let task = op as? SYNQueueTask {
+            if let handler = completionBlock {
+                handler(task)
+            }
+            
+            serializationProvider.removeTask(task)
+        }
     }
 }
