@@ -9,7 +9,7 @@
 import UIKit
 import SYNQueue
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, SYNQueueSerializationProvider {
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
@@ -41,6 +41,20 @@ class ViewController: UIViewController {
     }
     
     @IBAction func removeTapped(sender: UIButton) {
+        
+    }
+    
+    // MARK: SYNQueueSerializationProvider functions
+    
+    func serializeTask(task: SYNQueueTask) {
+        
+    }
+    
+    func deserializeTasksWithQueue(queue: SYNQueue) -> Array<SYNQueueTask> {
+        
+    }
+    
+    func removeTask(task: SYNQueueTask) {
         
     }
 }

@@ -126,6 +126,10 @@ public class SYNQueueTask : NSOperation {
                 println("Max retries exceeded for task \(name)")
                 executing = false
                 finished = true
+                
+                // Will trigger the queue to remove the persisted task
+                queue?.taskComplete(self)
+                
                 return
             }
             

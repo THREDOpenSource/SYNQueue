@@ -8,12 +8,21 @@
 
 import Foundation
 
+public protocol SYNQueueSerializationProvider {
+    
+    func serializeTask(task: SYNQueueTask)
+    func deserializeTasksWithQueue(queue: SYNQueue) -> Array<SYNQueueTask>
+    func removeTask(task: SYNQueueTask)
+}
+
 public class SYNQueue : NSOperationQueue {
     public let maxRetries: Int
+    public let serializationProvider: SYNQueueSerializationProvider
     var taskHandlers: [String: SYNTaskCallback] = [:]
     
-    public init(queueName: String, maxConcurrency: Int, maxRetries: Int) {
+    public init(queueName: String, maxConcurrency: Int, maxRetries: Int, serializationProvider: SYNQueueSerializationProvider) {
         self.maxRetries = maxRetries
+        self.serializationProvider = serializationProvider
         
         super.init()
         
@@ -26,8 +35,13 @@ public class SYNQueue : NSOperationQueue {
     }
     
     override public func addOperation(op: NSOperation) {
-        // FIXME: Serialization
         
+        if let op = op as? SYNQueueTask {
+            serializationProvider.serializeTask(op)
+        } else {
+            print("Could not serialize operation because operation was not a SYNQueueTask instance")
+        }
+
         super.addOperation(op)
     }
     
@@ -44,5 +58,6 @@ public class SYNQueue : NSOperationQueue {
     
     func taskComplete(task: SYNQueueTask) {
         
+        serializationProvider.removeTask(task)
     }
 }
