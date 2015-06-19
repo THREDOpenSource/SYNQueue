@@ -17,6 +17,7 @@ public class SYNQueueTask : NSOperation {
     static let MAX_RETRY_DELAY = 60.0
     
     public weak var queue: SYNQueue?
+    public let taskID: String
     public let taskType: String
     public let data: [String: AnyObject]
     public let created: NSDate
@@ -27,6 +28,7 @@ public class SYNQueueTask : NSOperation {
     var _executing: Bool = false
     var _finished: Bool = false
     
+    public override var name:String? { get { return taskID } set { } }
     public override var asynchronous:Bool { return true }
     public override var executing:Bool { get { return _executing } set { _executing = newValue } }
     public override var finished:Bool { get { return _finished } set { _finished = newValue } }
@@ -38,6 +40,7 @@ public class SYNQueueTask : NSOperation {
         qualityOfService: NSQualityOfService = .Default)
     {
         self.queue = queue
+        self.taskID = taskID
         self.taskType = taskType
         self.dependencyStrs = dependencyStrs
         self.data = data
@@ -47,7 +50,6 @@ public class SYNQueueTask : NSOperation {
         
         super.init()
         
-        self.name = taskID
         self.queuePriority = queuePriority
         self.qualityOfService = qualityOfService
     }
@@ -93,7 +95,7 @@ public class SYNQueueTask : NSOperation {
     
     public func toDictionary() -> [String: AnyObject?] {
         var dict = [String: AnyObject?]()
-        dict["taskID"] = self.name
+        dict["taskID"] = self.taskID
         dict["taskType"] = self.taskType
         dict["dependencies"] = self.dependencyStrs
         dict["queuePriority"] = self.queuePriority.rawValue
@@ -119,11 +121,11 @@ public class SYNQueueTask : NSOperation {
     
     public func completed(error: NSError?) {
         if let error = error {
-            println("Task \(name) failed with error: \(error)")
+            println("Task \(taskID) failed with error: \(error)")
             
             // Check if we've exceeded the max allowed retries
             if ++retries >= queue?.maxRetries {
-                println("Max retries exceeded for task \(name)")
+                println("Max retries exceeded for task \(taskID)")
                 executing = false
                 finished = true
                 
