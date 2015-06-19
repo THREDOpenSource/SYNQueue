@@ -43,7 +43,7 @@ public class SYNQueue : NSOperationQueue {
         if let op = op as? SYNQueueTask {
             serializationProvider.serializeTask(op)
         } else {
-            print("Could not serialize operation because operation was not a SYNQueueTask instance")
+            println("Could not serialize operation because operation was not a SYNQueueTask instance")
         }
         
         op.completionBlock = { self.taskComplete(op) }
@@ -54,6 +54,9 @@ public class SYNQueue : NSOperationQueue {
     func runTask(task:SYNQueueTask) {
         if let handler = taskHandlers[task.taskType] {
             handler(task)
+        } else {
+            println("No handler registered for task \(task.taskID)")
+            task.cancel()
         }
     }
     

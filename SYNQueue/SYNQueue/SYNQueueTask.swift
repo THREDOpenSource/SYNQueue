@@ -123,14 +123,26 @@ public class SYNQueueTask : NSOperation {
         return dict
     }
     
-    override public func start() {
+    public override func start() {
         super.start()
         
         executing = true
         run()
     }
     
+    public override func cancel() {
+        super.cancel()
+        
+        println("Canceled task \(taskID)")
+        markFinished()
+    }
+    
     func run() {
+        if cancelled || finished {
+            markFinished()
+            return
+        }
+        
         queue?.runTask(self)
     }
     
