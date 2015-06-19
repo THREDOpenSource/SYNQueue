@@ -103,7 +103,7 @@ public class SYNQueueTask : NSOperation {
                 self.addDependency(task)
             } else {
                 let name = self.name ?? "(unknown)"
-                print("Discarding missing dependency \(taskID) from \(name)")
+                println("Discarding missing dependency \(taskID) from \(name)")
             }
         }
     }
@@ -147,6 +147,14 @@ public class SYNQueueTask : NSOperation {
     }
     
     public func completed(error: NSError?) {
+        
+        // Check to make sure we're even executing, if not
+        // just ignore the completed call
+        if (!executing) {
+            println("Completion called on task \(taskID) when task was not even executing")
+            return
+        }
+        
         if let error = error {
             println("Task \(taskID) failed with error: \(error)")
             
