@@ -150,7 +150,7 @@ public class SYNQueueTask : NSOperation {
             let seconds:NSTimeInterval = min(SYNQueueTask.MAX_RETRY_DELAY, SYNQueueTask.MIN_RETRY_DELAY * pow(2.0, exp - 1))
             
             println("Waiting \(seconds) seconds to retry task \(taskID)")
-            Utils.runInBackgroundAfter(seconds, callback: { self.run() })
+            Utils.runInBackgroundAfter(seconds) { self.run() }
         } else {
             println("Task \(taskID) completed")
             markFinished()
