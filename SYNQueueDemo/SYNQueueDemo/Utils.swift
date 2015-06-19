@@ -11,14 +11,10 @@ import SYNQueue
 
 class Utils {
     private static var once = dispatch_once_t()
-    private static var _printQueue: SYNQueue? = nil
+    private static var _printQueue: SYNQueue = SYNQueue(queueName: "printQueue")
     private static var printQueue: SYNQueue = {
         dispatch_once(&once) {
-            let queue = SYNQueue(queueName: "printQueue", maxConcurrency: 1,
-                maxRetries: 0, logProvider: nil, serializationProvider: nil,
-                completionBlock: nil)
-            
-            queue.addTaskHandler("print", taskHandler: {
+            _printQueue.addTaskHandler("print", taskHandler: {
                 (task: SYNQueueTask) in
                 
                 if let str = task.data["toPrint"] as? String {
@@ -26,11 +22,9 @@ class Utils {
                 }
                 task.completed(nil)
             })
-            
-            _printQueue = queue
         }
         
-        return _printQueue!
+        return _printQueue
     }()
     
     class func print(toPrint: String) {

@@ -44,10 +44,10 @@ public class SYNQueue : NSOperationQueue {
     var taskHandlers: [String: SYNTaskCallback] = [:]
     let completionBlock: SYNTaskCallback?
     
-    public init(queueName: String, maxConcurrency: Int, maxRetries: Int,
-        logProvider: SYNQueueLogProvider?,
-        serializationProvider: SYNQueueSerializationProvider?,
-        completionBlock: SYNTaskCallback?)
+    public init(queueName: String, maxConcurrency: Int = 1, maxRetries: Int = 5,
+        logProvider: SYNQueueLogProvider? = nil,
+        serializationProvider: SYNQueueSerializationProvider? = nil,
+        completionBlock: SYNTaskCallback? = nil)
     {
         self.maxRetries = maxRetries
         self.logProvider = logProvider
