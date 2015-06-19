@@ -38,10 +38,15 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         // completion in this example is based on user interaction
         println("Running task \(task.taskID)")
         
+        // Set task completion after 5 seconds
+        Utils.runOnMainThreadAfterDelay(5, callback: { () -> () in
+            task.completed(nil)
+        })
+        
+        // Redraw this task to show it as active
         if  let queue = queue,
             let index = Utils.findIndex(queue.operations as! [NSOperation], valueToFind: task)
         {
-            // Redraw this task to show it as active
             Utils.runOnMainThread {
                 let path = NSIndexPath(forItem: index, inSection: 0)
                 self.collectionView.reloadData()
@@ -72,13 +77,14 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         if let task = queue!.operations[indexPath.item] as? SYNQueueTask {
             cell.task = task
             cell.nameLabel.text = "task \(task.taskID)"
+            cell.succeedButton.enabled = false // disable because completion is automatic with delay
             if task.executing {
                 cell.backgroundColor = UIColor.blueColor()
                 cell.failButton.enabled = true
-                cell.succeedButton.enabled = true
+                //cell.succeedButton.enabled = true
             } else {
                 cell.backgroundColor = UIColor.grayColor()
-                cell.succeedButton.enabled = false
+                //cell.succeedButton.enabled = false
                 cell.failButton.enabled = false
             }
         }
@@ -99,7 +105,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         // Find the first task in the list
         if let task = queue!.operations.first as? SYNQueueTask {
             println("Removing task \(task.taskID)")
-            
             task.cancel()
             collectionView.reloadData()
         }
