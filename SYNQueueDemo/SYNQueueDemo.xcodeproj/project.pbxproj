@@ -16,6 +16,7 @@
 		9FD63FB91B333E15001BD09A /* SYNQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FD63FB81B333E15001BD09A /* SYNQueue.framework */; };
 		9FD63FBA1B333E15001BD09A /* SYNQueue.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9FD63FB81B333E15001BD09A /* SYNQueue.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9FD63FC51B338BA5001BD09A /* TaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63FC41B338BA5001BD09A /* TaskCell.swift */; };
+		9FD63FC71B33EA2F001BD09A /* NSUserDefaultsSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63FC61B33EA2F001BD09A /* NSUserDefaultsSerializer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		9FD63FAC1B333BDC001BD09A /* SYNQueueDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SYNQueueDemoTests.swift; sourceTree = "<group>"; };
 		9FD63FB81B333E15001BD09A /* SYNQueue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SYNQueue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FD63FC41B338BA5001BD09A /* TaskCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskCell.swift; sourceTree = "<group>"; };
+		9FD63FC61B33EA2F001BD09A /* NSUserDefaultsSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSUserDefaultsSerializer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,13 +100,14 @@
 		9FD63F931B333BDC001BD09A /* SYNQueueDemo */ = {
 			isa = PBXGroup;
 			children = (
+				9FD63F9D1B333BDC001BD09A /* Images.xcassets */,
+				9FD63F941B333BDC001BD09A /* Supporting Files */,
 				9FD63F961B333BDC001BD09A /* AppDelegate.swift */,
 				9FD63F981B333BDC001BD09A /* ViewController.swift */,
 				9FD63F9A1B333BDC001BD09A /* Main.storyboard */,
-				9FD63F9D1B333BDC001BD09A /* Images.xcassets */,
 				9FD63F9F1B333BDC001BD09A /* LaunchScreen.xib */,
-				9FD63F941B333BDC001BD09A /* Supporting Files */,
 				9FD63FC41B338BA5001BD09A /* TaskCell.swift */,
+				9FD63FC61B33EA2F001BD09A /* NSUserDefaultsSerializer.swift */,
 			);
 			path = SYNQueueDemo;
 			sourceTree = "<group>";
@@ -239,6 +242,7 @@
 				9FD63F991B333BDC001BD09A /* ViewController.swift in Sources */,
 				9FD63FC51B338BA5001BD09A /* TaskCell.swift in Sources */,
 				9FD63F971B333BDC001BD09A /* AppDelegate.swift in Sources */,
+				9FD63FC71B33EA2F001BD09A /* NSUserDefaultsSerializer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

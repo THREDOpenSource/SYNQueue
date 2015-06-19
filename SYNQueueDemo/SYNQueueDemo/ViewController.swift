@@ -12,7 +12,7 @@ import SYNQueue
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var collectionView: UICollectionView!
     
-    let queue = SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 5)
+    let queue = SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 5, serializationProvider: NSUserDefaultsSerializer())
     var tasks = [SYNQueueTask]()
     var nextTaskID = 1
     
@@ -73,4 +73,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             collectionView.reloadData()
         }
     }
+    
+    
 }
