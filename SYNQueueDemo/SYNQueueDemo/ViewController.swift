@@ -36,7 +36,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     func taskHandler(task: SYNQueueTask) {
         // NOTE: Tasks are not actually handled here like usual since task
         // completion in this example is based on user interaction
-        println("Running task \(task.taskID)")
+        Utils.print("Running task \(task.taskID)")
         
         // Set task completion after 5 seconds
         Utils.runOnMainThreadAfterDelay(5, callback: { () -> () in
@@ -55,7 +55,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     func taskComplete(task: SYNQueueTask) {
-        println("taskComplete(\(task.taskID))")
+        Utils.print("taskComplete(\(task.taskID))")
         Utils.runOnMainThread { self.collectionView.reloadData() }
     }
     
@@ -104,7 +104,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     @IBAction func removeTapped(sender: UIButton) {
         // Find the first task in the list
         if let task = queue!.operations.first as? SYNQueueTask {
-            println("Removing task \(task.taskID)")
+            Utils.print("Removing task \(task.taskID)")
             task.cancel()
             collectionView.reloadData()
         }

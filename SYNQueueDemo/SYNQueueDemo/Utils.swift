@@ -10,22 +10,31 @@ import Foundation
 import SYNQueue
 
 class Utils {
-    
-    static let shared:Utils = Utils()
-    
-    private var printQueue:SYNQueue = SYNQueue(queueName: "printQueue", maxConcurrency: 1, maxRetries: 1, serializationProvider: nil, completionBlock: nil)
-    
-    init() {
-        printQueue.addTaskHandler("print", taskHandler: { (task: SYNQueueTask) -> Void in
-            println(task.data["toPrint"] as? String)
-            task.completed(nil)
-        })
-    }
-    
-    func print(toPrint: String) {
+    private static var once = dispatch_once_t()
+    private static var _printQueue: SYNQueue? = nil
+    private static var printQueue: SYNQueue = {
+        dispatch_once(&once) {
+            let queue = SYNQueue(queueName: "printQueue", maxConcurrency: 1,
+                maxRetries: 0, serializationProvider: nil, completionBlock: nil)
+            
+            queue.addTaskHandler("print", taskHandler: {
+                (task: SYNQueueTask) in
+                
+                if let str = task.data["toPrint"] as? String {
+                    println(str)
+                }
+                task.completed(nil)
+            })
+            
+            _printQueue = queue
+        }
         
+        return _printQueue!
+    }()
+    
+    class func print(toPrint: String) {
         let task = SYNQueueTask(queue: printQueue, taskID:toPrint,
-            taskType: "print", dependencyStrs: [], data: ["toPrint":toPrint])
+            taskType: "print", dependencyStrs: [], data: ["toPrint": toPrint])
         
         printQueue.addOperation(task)
     }
