@@ -31,9 +31,9 @@ public protocol SYNQueueLogProvider {
 }
 
 public protocol SYNQueueSerializationProvider {
-    func serializeTask(task: SYNQueueTask)
-    func deserializeTasksWithQueue(queue: SYNQueue) -> Array<SYNQueueTask>
-    func removeTask(task: SYNQueueTask)
+    func serializeTask(task: SYNQueueTask, queueName: String)
+    func deserializeTasksInQueue(queue: SYNQueue) -> [SYNQueueTask]
+    func removeTask(taskID: String, queue: SYNQueue)
 }
 
 public class SYNQueue : NSOperationQueue {
@@ -64,18 +64,35 @@ public class SYNQueue : NSOperationQueue {
         taskHandlers[taskType] = taskHandler
     }
     
+    public func loadSerializedTasks() {
+        if let sp = serializationProvider {
+            let tasks = sp.deserializeTasksInQueue(self)
+            
+            for task in tasks {
+                task.setupDependencies(tasks)
+                addDeserializedTask(task)
+            }
+        }
+    }
+    
     override public func addOperation(op: NSOperation) {
-        if  let op = op as? SYNQueueTask,
-            let sp = serializationProvider {
-            sp.serializeTask(op)
+        if  let sp = serializationProvider,
+            let op = op as? SYNQueueTask,
+            let queueName = op.queue?.name
+        {
+            sp.serializeTask(op, queueName: queueName)
         }
         
         op.completionBlock = { self.taskComplete(op) }
-        
         super.addOperation(op)
     }
     
-    func runTask(task:SYNQueueTask) {
+    func addDeserializedTask(task: SYNQueueTask) {
+        task.completionBlock = { self.taskComplete(task) }
+        super.addOperation(task)
+    }
+    
+    func runTask(task: SYNQueueTask) {
         if let handler = taskHandlers[task.taskType] {
             handler(task)
         } else {
@@ -90,8 +107,8 @@ public class SYNQueue : NSOperationQueue {
                 handler(task)
             }
             
-            if let sp = serializationProvider {
-                sp.removeTask(task)
+            if let sp = serializationProvider, let queue = task.queue {
+                sp.removeTask(task.taskID, queue: queue)
             }
         }
     }

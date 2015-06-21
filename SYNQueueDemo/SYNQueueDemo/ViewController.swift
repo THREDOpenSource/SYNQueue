@@ -22,6 +22,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             logProvider: self, serializationProvider: NSUserDefaultsSerializer(),
             completionBlock: taskComplete)
         queue!.addTaskHandler("cellTask", taskHandler: taskHandler)
+        
+        queue!.loadSerializedTasks()
     }
     
     override func viewDidLayoutSubviews() {

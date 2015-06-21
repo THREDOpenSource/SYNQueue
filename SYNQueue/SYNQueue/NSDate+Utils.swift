@@ -31,9 +31,8 @@ extension NSDate {
             self.init(timeInterval:0, sinceDate:d)
         } else {
             self.init(timeInterval:0, sinceDate:NSDate())
+            return nil
         }
-        
-        return nil
     }
     
     var isoFormatter: ISOFormatter {

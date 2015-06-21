@@ -49,10 +49,10 @@ public class SYNQueueTask : NSOperation {
     }
     
     public init(queue:SYNQueue, taskID: String, taskType: String,
-        dependencyStrs: [String], data: [String: AnyObject],
+        dependencyStrs: [String] = [], data: [String: AnyObject] = [:],
         created: NSDate = NSDate(), started: NSDate? = nil, retries: Int = 0,
         queuePriority: NSOperationQueuePriority = .Normal,
-        qualityOfService: NSQualityOfService = .Default)
+        qualityOfService: NSQualityOfService = .Utility)
     {
         self.queue = queue
         self.taskID = taskID
@@ -69,29 +69,39 @@ public class SYNQueueTask : NSOperation {
         self.qualityOfService = qualityOfService
     }
     
-    public convenience init?(dictionary: JSONDictionary, queue:SYNQueue) {
+    public convenience init?(dictionary: JSONDictionary, queue: SYNQueue) {
         if  let taskID = dictionary["taskID"] as? String,
             let taskType = dictionary["taskType"] as? String,
-            let dependencyStrs = dictionary["dependencies"] as? [String],
-            let queuePriority = dictionary["queuePriority"] as? NSOperationQueuePriority,
-            let qualityOfService = dictionary["qualityOfService"] as? NSQualityOfService,
-            let data = dictionary["data"] as? [String: AnyObject],
+            let dependencyStrs = dictionary["dependencies"] as? [String]? ?? [],
+            let queuePriority = dictionary["queuePriority"] as? Int,
+            let qualityOfService = dictionary["qualityOfService"] as? Int,
+            let data = dictionary["data"] as? [String: AnyObject]? ?? [:],
             let createdStr = dictionary["created"] as? String,
-            let startedStr = dictionary["started"] as? String?,
-            let retries = dictionary["retries"] as? Int
+            let startedStr: String? = dictionary["started"] as? String ?? nil,
+            let retries = dictionary["retries"] as? Int? ?? 0
         {
             let created = NSDate(dateString: createdStr) ?? NSDate()
             let started = (startedStr != nil) ? NSDate(dateString: startedStr!) : nil
+            let priority = NSOperationQueuePriority(rawValue: queuePriority) ?? .Normal
+            let qos = NSQualityOfService(rawValue: qualityOfService) ?? .Utility
             
             self.init(queue: queue, taskID: taskID, taskType: taskType,
                 dependencyStrs: dependencyStrs, data: data, created: created,
-                started: started, retries: retries, queuePriority: queuePriority,
-                qualityOfService: qualityOfService)
+                started: started, retries: retries, queuePriority: priority,
+                qualityOfService: qos)
         } else {
-            self.init(queue: queue, taskID: "", taskType: "", dependencyStrs: [], data: [:])
+            self.init(queue: queue, taskID: "", taskType: "")
+            return nil
         }
-        
-        return nil
+    }
+    
+    public convenience init?(json: String, queue: SYNQueue) {
+        if let dict = Utils.fromJSON(json) as? [String: AnyObject] {
+            self.init(dictionary: dict, queue: queue)
+        } else {
+            self.init(queue: queue, taskID: "", taskType: "")
+            return nil
+        }
     }
     
     public func setupDependencies(allTasks: [SYNQueueTask]) {
@@ -121,6 +131,20 @@ public class SYNQueueTask : NSOperation {
         dict["retries"] = self.retries
         
         return dict
+    }
+    
+    public func toJSONString() -> String? {
+        // Serialize this task to a dictionary
+        let dict = toDictionary()
+        
+        // Convert the dictionary to an NSDictionary by replacing nil values
+        // with NSNull
+        var nsdict = NSMutableDictionary(capacity: dict.count)
+        for (key, value) in dict {
+            nsdict[key] = value ?? NSNull()
+        }
+        
+        return Utils.toJSON(nsdict)
     }
     
     public override func start() {
