@@ -24,7 +24,7 @@ class TaskCell : UICollectionViewCell {
     
     @IBAction func failTapped(sender: UIButton) {
         if let task = task {
-            let err = Utils.error("User tapped Fail on task \(task.taskID)")
+            let err = error("User tapped Fail on task \(task.taskID)")
             task.completed(err)
         }
     }

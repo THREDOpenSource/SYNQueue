@@ -41,7 +41,8 @@ public class SYNQueue : NSOperationQueue {
     
     let serializationProvider: SYNQueueSerializationProvider?
     let logProvider: SYNQueueLogProvider?
-    var taskHandlers: [String: SYNTaskCallback] = [:]
+    var tasks = [String: SYNQueueTask]()
+    var taskHandlers = [String: SYNTaskCallback]()
     let completionBlock: SYNTaskCallback?
     
     public init(queueName: String, maxConcurrency: Int = 1, maxRetries: Int = 5,
@@ -75,12 +76,22 @@ public class SYNQueue : NSOperationQueue {
         }
     }
     
+    public func getTask(taskID: String) -> SYNQueueTask? {
+        return tasks[taskID]
+    }
+    
     override public func addOperation(op: NSOperation) {
-        if  let sp = serializationProvider,
-            let op = op as? SYNQueueTask,
-            let queueName = op.queue?.name
-        {
-            sp.serializeTask(op, queueName: queueName)
+        if let task = op as? SYNQueueTask {
+            if tasks[task.taskID] != nil {
+                log(.Warning, "Attempted to add duplicate task \(task.taskID)")
+                return
+            }
+            tasks[task.taskID] = task
+            
+            // Serialize this operation
+            if let sp = serializationProvider, let queueName = task.queue.name {
+                sp.serializeTask(task, queueName: queueName)
+            }
         }
         
         op.completionBlock = { self.taskComplete(op) }
@@ -88,6 +99,11 @@ public class SYNQueue : NSOperationQueue {
     }
     
     func addDeserializedTask(task: SYNQueueTask) {
+        if tasks[task.taskID] != nil {
+            log(.Warning, "Attempted to add duplicate deserialized task \(task.taskID)")
+            return
+        }
+        
         task.completionBlock = { self.taskComplete(task) }
         super.addOperation(task)
     }
@@ -103,12 +119,15 @@ public class SYNQueue : NSOperationQueue {
     
     func taskComplete(op: NSOperation) {
         if let task = op as? SYNQueueTask {
+            tasks.removeValueForKey(task.taskID)
+            
             if let handler = completionBlock {
                 handler(task)
             }
             
-            if let sp = serializationProvider, let queue = task.queue {
-                sp.removeTask(task.taskID, queue: queue)
+            // Remove this operation from serialization
+            if let sp = serializationProvider {
+                sp.removeTask(task.taskID, queue: task.queue)
             }
         }
     }

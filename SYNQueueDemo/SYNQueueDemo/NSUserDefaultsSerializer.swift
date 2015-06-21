@@ -26,7 +26,7 @@ class NSUserDefaultsSerializer : SYNQueueSerializationProvider {
             
             defaults.setValue(stringArray, forKey: queueName)
         } else {
-            Utils.print("[ERROR] Failed to serialize task \(task.taskID) in queue \(queueName)")
+            log(.Error, "Failed to serialize task \(task.taskID) in queue \(queueName)")
         }
     }
     

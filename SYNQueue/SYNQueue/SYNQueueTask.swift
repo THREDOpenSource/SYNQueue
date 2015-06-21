@@ -16,10 +16,10 @@ public class SYNQueueTask : NSOperation {
     static let MIN_RETRY_DELAY = 0.2
     static let MAX_RETRY_DELAY = 60.0
     
-    public weak var queue: SYNQueue?
+    public let queue: SYNQueue
     public let taskID: String
     public let taskType: String
-    public let data: [String: AnyObject]
+    public let data: AnyObject?
     public let created: NSDate
     
     let dependencyStrs: [String]
@@ -28,8 +28,8 @@ public class SYNQueueTask : NSOperation {
     var _executing: Bool = false
     var _finished: Bool = false
     
-    public override var name:String? { get { return taskID } set { } }
-    public override var asynchronous:Bool { return true }
+    public override var name: String? { get { return taskID } set { } }
+    public override var asynchronous: Bool { return true }
     
     public override var executing: Bool {
         get { return _executing }
@@ -48,8 +48,8 @@ public class SYNQueueTask : NSOperation {
         }
     }
     
-    public init(queue:SYNQueue, taskID: String, taskType: String,
-        dependencyStrs: [String] = [], data: [String: AnyObject] = [:],
+    public init(queue: SYNQueue, taskID: String, taskType: String,
+        dependencyStrs: [String] = [], data: AnyObject? = nil,
         created: NSDate = NSDate(), started: NSDate? = nil, retries: Int = 0,
         queuePriority: NSOperationQueuePriority = .Normal,
         qualityOfService: NSQualityOfService = .Utility)
@@ -75,7 +75,7 @@ public class SYNQueueTask : NSOperation {
             let dependencyStrs = dictionary["dependencies"] as? [String]? ?? [],
             let queuePriority = dictionary["queuePriority"] as? Int,
             let qualityOfService = dictionary["qualityOfService"] as? Int,
-            let data = dictionary["data"] as? [String: AnyObject]? ?? [:],
+            let data: AnyObject? = dictionary["data"] as AnyObject??,
             let createdStr = dictionary["created"] as? String,
             let startedStr: String? = dictionary["started"] as? String ?? nil,
             let retries = dictionary["retries"] as? Int? ?? 0
@@ -96,7 +96,7 @@ public class SYNQueueTask : NSOperation {
     }
     
     public convenience init?(json: String, queue: SYNQueue) {
-        if let dict = Utils.fromJSON(json) as? [String: AnyObject] {
+        if let dict = fromJSON(json) as? [String: AnyObject] {
             self.init(dictionary: dict, queue: queue)
         } else {
             self.init(queue: queue, taskID: "", taskType: "")
@@ -113,7 +113,7 @@ public class SYNQueueTask : NSOperation {
                 self.addDependency(task)
             } else {
                 let name = self.name ?? "(unknown)"
-                self.queue?.log(.Warning, "Discarding missing dependency \(taskID) from \(name)")
+                self.queue.log(.Warning, "Discarding missing dependency \(taskID) from \(name)")
             }
         }
     }
@@ -144,7 +144,7 @@ public class SYNQueueTask : NSOperation {
             nsdict[key] = value ?? NSNull()
         }
         
-        return Utils.toJSON(nsdict)
+        return toJSON(nsdict)
     }
     
     public override func start() {
@@ -157,52 +157,44 @@ public class SYNQueueTask : NSOperation {
     public override func cancel() {
         super.cancel()
         
-        queue?.log(.Debug, "Canceled task \(taskID)")
-        markFinished()
+        queue.log(.Debug, "Canceled task \(taskID)")
+        finished = true
     }
     
     func run() {
-        if cancelled || finished {
-            markFinished()
-            return
-        }
+        if cancelled && !finished { finished = true }
+        if finished { return }
         
-        queue?.runTask(self)
+        queue.runTask(self)
     }
     
     public func completed(error: NSError?) {
-        
         // Check to make sure we're even executing, if not
         // just ignore the completed call
         if (!executing) {
-            queue?.log(.Debug, "Completion called on already completed task \(taskID)")
+            queue.log(.Debug, "Completion called on already completed task \(taskID)")
             return
         }
         
         if let error = error {
-            queue?.log(.Warning, "Task \(taskID) failed with error: \(error)")
+            queue.log(.Warning, "Task \(taskID) failed with error: \(error)")
             
             // Check if we've exceeded the max allowed retries
-            if ++retries >= queue?.maxRetries {
-                queue?.log(.Error, "Max retries exceeded for task \(taskID)")
-                markFinished()
+            if ++retries >= queue.maxRetries {
+                queue.log(.Error, "Max retries exceeded for task \(taskID)")
+                cancel()
                 return
             }
             
             // Wait a bit (exponential backoff) and retry this task
-            let exp = Double(min(queue?.maxRetries ?? 0, retries))
+            let exp = Double(min(queue.maxRetries ?? 0, retries))
             let seconds:NSTimeInterval = min(SYNQueueTask.MAX_RETRY_DELAY, SYNQueueTask.MIN_RETRY_DELAY * pow(2.0, exp - 1))
             
-            queue?.log(.Debug, "Waiting \(seconds) seconds to retry task \(taskID)")
-            Utils.runInBackgroundAfter(seconds) { self.run() }
+            queue.log(.Debug, "Waiting \(seconds) seconds to retry task \(taskID)")
+            runInBackgroundAfter(seconds) { self.run() }
         } else {
-            queue?.log(.Debug, "Task \(taskID) completed")
-            markFinished()
+            queue.log(.Debug, "Task \(taskID) completed")
+            finished = true
         }
-    }
-    
-    func markFinished() {
-        finished = true
-        executing = false
     }
 }

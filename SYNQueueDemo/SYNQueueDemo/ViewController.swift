@@ -9,21 +9,28 @@
 import UIKit
 import SYNQueue
 
-class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, SYNQueueLogProvider {
+class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var collectionView: UICollectionView!
     
-    var queue: SYNQueue?
     var nextTaskID = 1
+    lazy var queue: SYNQueue = {
+        return SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 3,
+            logProvider: ConsoleLogger(), serializationProvider: NSUserDefaultsSerializer(),
+            completionBlock: { [weak self] in self?.taskComplete($0) })
+    }()
+    
+    // MARK: - UIViewController Overrides
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        queue = SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 3,
-            logProvider: self, serializationProvider: NSUserDefaultsSerializer(),
-            completionBlock: taskComplete)
-        queue!.addTaskHandler("cellTask", taskHandler: taskHandler)
+        queue.addTaskHandler("cellTask", taskHandler: taskHandler)
+        queue.loadSerializedTasks()
         
-        queue!.loadSerializedTasks()
+        let taskIDs = queue.operations
+            .map { return $0 as? SYNQueueTask }
+            .map { return $0?.taskID.toInt() ?? 0 }
+        nextTaskID = (arrayMax(taskIDs) ?? 0) + 1
     }
     
     override func viewDidLayoutSubviews() {
@@ -36,21 +43,22 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         collectionView.performBatchUpdates(nil, completion: nil)
     }
     
+    // MARK: - SYNQueueTask Handling
+    
     func taskHandler(task: SYNQueueTask) {
         // NOTE: Tasks are not actually handled here like usual since task
         // completion in this example is based on user interaction
         log(.Info, "Running task \(task.taskID)")
         
+        // FIXME: This needs to be a toggle option in the UI
         // Set task completion after 5 seconds
-        Utils.runOnMainThreadAfterDelay(5, callback: { () -> () in
-            task.completed(nil)
-        })
+//        Utils.runOnMainThreadAfterDelay(5, callback: { () -> () in
+//            task.completed(nil)
+//        })
         
         // Redraw this task to show it as active
-        if  let queue = queue,
-            let index = Utils.findIndex(queue.operations as! [NSOperation], valueToFind: task)
-        {
-            Utils.runOnMainThread {
+        if let index = findIndex(queue.operations as! [NSOperation], task) {
+            runOnMainThread {
                 let path = NSIndexPath(forItem: index, inSection: 0)
                 self.collectionView.reloadData()
             }
@@ -59,13 +67,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     func taskComplete(task: SYNQueueTask) {
         log(.Info, "taskComplete(\(task.taskID))")
-        Utils.runOnMainThread { self.collectionView.reloadData() }
-    }
-    
-    // MARK: - SYNQueueLogProvider Delegates
-    
-    func log(level: LogLevel, _ msg: String) {
-        Utils.print("[\(level.toString().uppercaseString)] \(msg)")
+        if queue.operationCount == 0 { self.nextTaskID = 1 }
+        runOnMainThread { self.collectionView.reloadData() }
     }
     
     // MARK: - UICollectionView Delegates
@@ -73,7 +76,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection
         section: Int) -> Int
     {
-        return queue!.operationCount
+        return queue.operationCount
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath
@@ -83,7 +86,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             "TaskCell", forIndexPath: indexPath) as! TaskCell
         cell.backgroundColor = UIColor.redColor()
         
-        if let task = queue!.operations[indexPath.item] as? SYNQueueTask {
+        if let task = queue.operations[indexPath.item] as? SYNQueueTask {
             cell.task = task
             cell.nameLabel.text = "task \(task.taskID)"
             if task.executing {
@@ -103,15 +106,24 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     // MARK: - IBActions
     
     @IBAction func addTapped(sender: UIButton) {
-        let task = SYNQueueTask(queue: queue!, taskID: String(nextTaskID++),
+        let taskID1 = nextTaskID++
+        let taskID2 = nextTaskID++
+        let task1 = SYNQueueTask(queue: queue, taskID: String(taskID1),
             taskType: "cellTask", dependencyStrs: [], data: [:])
+        let task2 = SYNQueueTask(queue: queue, taskID: String(taskID2),
+            taskType: "cellTask", dependencyStrs: [], data: [:])
+        
+        // Make the first task dependent on the second
+        task1.addDependency(task2)
+        
+        queue.addOperation(task1)
+        queue.addOperation(task2)
         collectionView.reloadData()
-        queue!.addOperation(task)
     }
     
     @IBAction func removeTapped(sender: UIButton) {
         // Find the first task in the list
-        if let task = queue!.operations.first as? SYNQueueTask {
+        if let task = queue.operations.first as? SYNQueueTask {
             log(.Info, "Removing task \(task.taskID)")
             task.cancel()
             collectionView.reloadData()
