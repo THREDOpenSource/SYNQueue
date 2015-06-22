@@ -9,6 +9,7 @@
 import Foundation
 import SYNQueue
 
+@objc
 class NSUserDefaultsSerializer : SYNQueueSerializationProvider {
     // MARK: - SYNQueueSerializationProvider Methods
     

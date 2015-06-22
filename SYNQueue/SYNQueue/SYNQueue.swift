@@ -17,6 +17,7 @@ Log level for use in the SYNQueueLogProvider `log()` call
 - Warning: "Warning"
 - Error:   "Error"
 */
+@objc
 public enum LogLevel: Int {
     case Trace   = 0
     case Debug   = 1
@@ -38,6 +39,7 @@ public enum LogLevel: Int {
 /**
 *  Conform to this protocol to provide logging to SYNQueue
 */
+@objc
 public protocol SYNQueueLogProvider {
     func log(level: LogLevel, _ msg: String)
 }
@@ -45,6 +47,7 @@ public protocol SYNQueueLogProvider {
 /**
 *  Conform to this protocol to provide serialization (persistence) to SYNQueue
 */
+@objc
 public protocol SYNQueueSerializationProvider {
     func serializeTask(task: SYNQueueTask, queueName: String)
     func deserializeTasksInQueue(queue: SYNQueue) -> [SYNQueueTask]
@@ -54,6 +57,7 @@ public protocol SYNQueueSerializationProvider {
 /**
 *  SYNQueue is a generic queue with customizable serialization, logging, task handling, retries, and concurrency behavior
 */
+@objc
 public class SYNQueue : NSOperationQueue {
     
     /// The maximum number of times a task will be retried if it fails
@@ -90,7 +94,7 @@ public class SYNQueue : NSOperationQueue {
     
     :returns: A new SYNQueue
     */
-    public init(queueName: String, maxConcurrency: Int = 1, maxRetries: Int = 5,
+    public required init(queueName: String, maxConcurrency: Int = 1, maxRetries: Int = 5,
         logProvider: SYNQueueLogProvider? = nil,
         serializationProvider: SYNQueueSerializationProvider? = nil,
         completionBlock: SYNTaskCompleteCallback? = nil)

@@ -13,6 +13,7 @@ func log(level: LogLevel, msg: String) {
     return ConsoleLogger.log(level, msg)
 }
 
+@objc
 class ConsoleLogger : SYNQueueLogProvider {
     // MARK: - SYNQueueLogProvider Delegates
     
