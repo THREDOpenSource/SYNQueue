@@ -17,28 +17,12 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EnV-Db-CHg">
-                                <rect key="frame" x="80" y="550" width="30" height="30"/>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" translatesAutoresizingMaskIntoConstraints="NO" id="eUG-Ry-AHi">
+                                <rect key="frame" x="16" y="24" width="568" height="3"/>
                                 <animations/>
-                                <state key="normal" title="Add">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="addTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="nBd-RP-AoR"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gl2-M7-6rH">
-                                <rect key="frame" x="463" y="550" width="57" height="30"/>
-                                <animations/>
-                                <state key="normal" title="Remove">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="removeTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hww-uS-Jn5"/>
-                                </connections>
-                            </button>
+                            </progressView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="iYl-xJ-9dS">
-                                <rect key="frame" x="16" y="20" width="568" height="520"/>
+                                <rect key="frame" x="16" y="30" width="568" height="510"/>
                                 <animations/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="RU3-sR-1Qy">
@@ -56,7 +40,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V2S-qr-0x0">
-                                                    <rect key="frame" x="170.5" y="8" width="113" height="30"/>
+                                                    <rect key="frame" x="171" y="8" width="113" height="30"/>
                                                     <animations/>
                                                     <color key="backgroundColor" red="0.67450982332229614" green="0.25490197539329529" blue="0.25882354378700256" alpha="1" colorSpace="calibratedRGB"/>
                                                     <state key="normal" title="Fail">
@@ -83,7 +67,7 @@
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w0F-YX-WcE">
-                                                    <rect key="frame" x="8" y="17" width="33.5" height="16"/>
+                                                    <rect key="frame" x="8" y="17" width="34" height="16"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -118,22 +102,52 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="EhQ-cw-ZTA"/>
                                 </connections>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EnV-Db-CHg">
+                                <rect key="frame" x="80" y="550" width="30" height="30"/>
+                                <animations/>
+                                <state key="normal" title="Add">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="addTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="nBd-RP-AoR"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gl2-M7-6rH">
+                                <rect key="frame" x="463" y="550" width="57" height="30"/>
+                                <animations/>
+                                <state key="normal" title="Remove">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="removeTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hww-uS-Jn5"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="eUG-Ry-AHi" secondAttribute="trailing" id="4xZ-8H-nAx"/>
                             <constraint firstAttribute="trailingMargin" secondItem="iYl-xJ-9dS" secondAttribute="trailing" id="7Gd-7N-F2B"/>
                             <constraint firstItem="iYl-xJ-9dS" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="85O-1J-7zE"/>
                             <constraint firstItem="iYl-xJ-9dS" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="NiF-a5-DYK"/>
                             <constraint firstItem="EnV-Db-CHg" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="64" id="XTf-dU-zoD"/>
+                            <constraint firstItem="eUG-Ry-AHi" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="YS9-LU-l8Z"/>
+                            <constraint firstItem="iYl-xJ-9dS" firstAttribute="top" secondItem="eUG-Ry-AHi" secondAttribute="bottom" constant="4" id="bL0-0o-d6T"/>
+                            <constraint firstItem="eUG-Ry-AHi" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="4" id="dRo-Nn-D1x"/>
                             <constraint firstItem="EnV-Db-CHg" firstAttribute="top" secondItem="iYl-xJ-9dS" secondAttribute="bottom" constant="10" id="dfK-8R-tV0"/>
                             <constraint firstItem="EnV-Db-CHg" firstAttribute="centerY" secondItem="gl2-M7-6rH" secondAttribute="centerY" id="kwD-88-d7P"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="EnV-Db-CHg" secondAttribute="bottom" constant="20" id="vP6-g7-pOn"/>
                             <constraint firstAttribute="trailingMargin" secondItem="gl2-M7-6rH" secondAttribute="trailing" constant="64" id="yhn-UO-xWP"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="NiF-a5-DYK"/>
+                            </mask>
+                        </variation>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="iYl-xJ-9dS" id="Fwb-cQ-XXU"/>
+                        <outlet property="progressView" destination="eUG-Ry-AHi" id="M2H-oh-HKq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

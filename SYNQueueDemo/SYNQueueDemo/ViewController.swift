@@ -10,13 +10,15 @@ import UIKit
 import SYNQueue
 
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var collectionView: UICollectionView!
     
+    var totalTasksSeen = 0
     var nextTaskID = 1
     lazy var queue: SYNQueue = {
         return SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 3,
             logProvider: ConsoleLogger(), serializationProvider: NSUserDefaultsSerializer(),
-            completionBlock: { [weak self] in self?.taskComplete($0) })
+            completionBlock: { [weak self] in self?.taskComplete($0, $1) })
     }()
     
     // MARK: - UIViewController Overrides
@@ -65,9 +67,20 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         }
     }
     
-    func taskComplete(task: SYNQueueTask) {
-        log(.Info, "taskComplete(\(task.taskID))")
-        if queue.operationCount == 0 { self.nextTaskID = 1 }
+    func taskComplete(error: NSError?, _ task: SYNQueueTask) {
+        if let error = error {
+            log(.Error, "Task \(task.taskID) failed with error: \(error)")
+        } else {
+            log(.Info, "Task \(task.taskID) completed successfully")
+        }
+        
+        if queue.operationCount == 0 {
+            nextTaskID = 1
+            totalTasksSeen = 0
+        }
+        
+        updateProgress()
+        
         runOnMainThread { self.collectionView.reloadData() }
     }
     
@@ -118,6 +131,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         
         queue.addOperation(task1)
         queue.addOperation(task2)
+        
+        totalTasksSeen = max(totalTasksSeen, queue.operationCount)
+        updateProgress()
+        
         collectionView.reloadData()
     }
     
@@ -125,8 +142,19 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         // Find the first task in the list
         if let task = queue.operations.first as? SYNQueueTask {
             log(.Info, "Removing task \(task.taskID)")
+            
             task.cancel()
+            
             collectionView.reloadData()
         }
+    }
+    
+    // MARK: - Helpers
+    
+    func updateProgress() {
+        let tasks = queue.tasks
+        let progress = Double(totalTasksSeen - tasks.count) / Double(totalTasksSeen)
+        
+        runOnMainThread { self.progressView.progress = Float(progress) }
     }
 }

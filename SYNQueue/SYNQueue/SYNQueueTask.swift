@@ -9,6 +9,7 @@
 import Foundation
 
 public typealias SYNTaskCallback = (SYNQueueTask) -> Void
+public typealias SYNTaskCompleteCallback = (NSError?, SYNQueueTask) -> Void
 public typealias JSONDictionary = [String: AnyObject?]
 
 /**
@@ -24,10 +25,11 @@ public class SYNQueueTask : NSOperation {
     public let taskType: String
     public let data: AnyObject?
     public let created: NSDate
+    public var started: NSDate?
+    public var retries: Int
     
     let dependencyStrs: [String]
-    var started: NSDate?
-    var retries: Int
+    var lastError: NSError?
     var _executing: Bool = false
     var _finished: Bool = false
     
@@ -212,6 +214,8 @@ public class SYNQueueTask : NSOperation {
     Cancels the task
     */
     public override func cancel() {
+        lastError = NSError(domain: "SYNQueue", code: -1, userInfo: [NSLocalizedDescriptionKey: "Task \(taskID) was cancelled"])
+        
         super.cancel()
         
         queue.log(.Debug, "Canceled task \(taskID)")
@@ -240,6 +244,7 @@ public class SYNQueueTask : NSOperation {
         }
         
         if let error = error {
+            lastError = error
             queue.log(.Warning, "Task \(taskID) failed with error: \(error)")
             
             // Check if we've exceeded the max allowed retries
@@ -256,6 +261,7 @@ public class SYNQueueTask : NSOperation {
             queue.log(.Debug, "Waiting \(seconds) seconds to retry task \(taskID)")
             runInBackgroundAfter(seconds) { self.run() }
         } else {
+            lastError = nil
             queue.log(.Debug, "Task \(taskID) completed")
             finished = true
         }

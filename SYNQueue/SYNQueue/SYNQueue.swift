@@ -61,9 +61,22 @@ public class SYNQueue : NSOperationQueue {
     
     let serializationProvider: SYNQueueSerializationProvider?
     let logProvider: SYNQueueLogProvider?
-    var tasks = [String: SYNQueueTask]()
+    var tasksMap = [String: SYNQueueTask]()
     var taskHandlers = [String: SYNTaskCallback]()
-    let completionBlock: SYNTaskCallback?
+    let completionBlock: SYNTaskCompleteCallback?
+    
+    public var tasks: [SYNQueueTask] {
+        let array = operations
+        
+        var output = [SYNQueueTask]()
+        output.reserveCapacity(array.count)
+        
+        for obj in array {
+            if let cast = obj as? SYNQueueTask { output.append(cast) }
+        }
+        
+        return output
+    }
     
     /**
     Initializes a SYNQueue with the provided options
@@ -80,7 +93,7 @@ public class SYNQueue : NSOperationQueue {
     public init(queueName: String, maxConcurrency: Int = 1, maxRetries: Int = 5,
         logProvider: SYNQueueLogProvider? = nil,
         serializationProvider: SYNQueueSerializationProvider? = nil,
-        completionBlock: SYNTaskCallback? = nil)
+        completionBlock: SYNTaskCompleteCallback? = nil)
     {
         self.maxRetries = maxRetries
         self.logProvider = logProvider
@@ -118,7 +131,7 @@ public class SYNQueue : NSOperationQueue {
     }
     
     public func getTask(taskID: String) -> SYNQueueTask? {
-        return tasks[taskID]
+        return tasksMap[taskID]
     }
     
     /**
@@ -128,11 +141,11 @@ public class SYNQueue : NSOperationQueue {
     */
     override public func addOperation(op: NSOperation) {
         if let task = op as? SYNQueueTask {
-            if tasks[task.taskID] != nil {
+            if tasksMap[task.taskID] != nil {
                 log(.Warning, "Attempted to add duplicate task \(task.taskID)")
                 return
             }
-            tasks[task.taskID] = task
+            tasksMap[task.taskID] = task
             
             // Serialize this operation
             if let sp = serializationProvider, let queueName = task.queue.name {
@@ -145,7 +158,7 @@ public class SYNQueue : NSOperationQueue {
     }
     
     func addDeserializedTask(task: SYNQueueTask) {
-        if tasks[task.taskID] != nil {
+        if tasksMap[task.taskID] != nil {
             log(.Warning, "Attempted to add duplicate deserialized task \(task.taskID)")
             return
         }
@@ -165,10 +178,10 @@ public class SYNQueue : NSOperationQueue {
     
     func taskComplete(op: NSOperation) {
         if let task = op as? SYNQueueTask {
-            tasks.removeValueForKey(task.taskID)
+            tasksMap.removeValueForKey(task.taskID)
             
             if let handler = completionBlock {
-                handler(task)
+                handler(task.lastError, task)
             }
             
             // Remove this operation from serialization
