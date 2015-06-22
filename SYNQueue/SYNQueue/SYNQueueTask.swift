@@ -11,6 +11,9 @@ import Foundation
 public typealias SYNTaskCallback = (SYNQueueTask) -> Void
 public typealias JSONDictionary = [String: AnyObject?]
 
+/**
+*  Represents a task to be executed on a SYNQueue
+*/
 @objc
 public class SYNQueueTask : NSOperation {
     static let MIN_RETRY_DELAY = 0.2
@@ -48,6 +51,23 @@ public class SYNQueueTask : NSOperation {
         }
     }
     
+    /**
+    Initializes a new SYNQueueTask with the following options
+    
+    :param: queue            The queue that will execute the task
+    :param: taskID           A unique identifier for the task, must be unique across app terminations, 
+                             otherwise dependencies will not work correctly
+    :param: taskType         A type that will be used to group tasks together, tasks have to generic with respect to their type
+    :param: dependencyStrs   Identifiers for tasks that are dependencies of this task
+    :param: data             The data that the task needs to operate on
+    :param: created          When the task was created
+    :param: started          When the task started executing
+    :param: retries          Number of times this task has been retried after failing
+    :param: queuePriority    The priority
+    :param: qualityOfService The quality of service
+    
+    :returns: A new SYNQueueTask
+    */
     public init(queue: SYNQueue, taskID: String, taskType: String,
         dependencyStrs: [String] = [], data: AnyObject? = nil,
         created: NSDate = NSDate(), started: NSDate? = nil, retries: Int = 0,
@@ -69,6 +89,14 @@ public class SYNQueueTask : NSOperation {
         self.qualityOfService = qualityOfService
     }
     
+    /**
+    Initializes a SYNQueueTask from a dictionary
+    
+    :param: dictionary A dictionary that contains the data to reconstruct a task
+    :param: queue      The queue that the task will execute on
+
+    :returns: A new SYNQueueTask
+    */
     public convenience init?(dictionary: JSONDictionary, queue: SYNQueue) {
         if  let taskID = dictionary["taskID"] as? String,
             let taskType = dictionary["taskType"] as? String,
@@ -95,6 +123,14 @@ public class SYNQueueTask : NSOperation {
         }
     }
     
+    /**
+    Initializes a SYNQueueTask from JSON
+    
+    :param: json    JSON from which the reconstruct the task
+    :param: queue   The queue that the task will execute on
+    
+    :returns: A new SYNQueueTask
+    */
     public convenience init?(json: String, queue: SYNQueue) {
         if let dict = fromJSON(json) as? [String: AnyObject] {
             self.init(dictionary: dict, queue: queue)
@@ -104,6 +140,11 @@ public class SYNQueueTask : NSOperation {
         }
     }
     
+    /**
+    Setup the dependencies for the task
+    
+    :param: allTasks Array of SYNQueueTasks that are dependencies of this task
+    */
     public func setupDependencies(allTasks: [SYNQueueTask]) {
         dependencyStrs.map {
             (taskID: String) -> Void in
@@ -118,6 +159,11 @@ public class SYNQueueTask : NSOperation {
         }
     }
     
+    /**
+    Deconstruct the task to a dictionary, used to serialize the task
+    
+    :returns: A Dictionary representation of the task
+    */
     public func toDictionary() -> [String: AnyObject?] {
         var dict = [String: AnyObject?]()
         dict["taskID"] = self.taskID
@@ -133,6 +179,11 @@ public class SYNQueueTask : NSOperation {
         return dict
     }
     
+    /**
+    Deconstruct the task to a JSON string, used to serialize the task
+    
+    :returns: A JSON string representation of the task
+    */
     public func toJSONString() -> String? {
         // Serialize this task to a dictionary
         let dict = toDictionary()
@@ -147,6 +198,9 @@ public class SYNQueueTask : NSOperation {
         return toJSON(nsdict)
     }
     
+    /**
+    Starts executing the task
+    */
     public override func start() {
         super.start()
         
@@ -154,6 +208,9 @@ public class SYNQueueTask : NSOperation {
         run()
     }
     
+    /**
+    Cancels the task
+    */
     public override func cancel() {
         super.cancel()
         
@@ -168,6 +225,12 @@ public class SYNQueueTask : NSOperation {
         queue.runTask(self)
     }
     
+    /**
+    Call this to mark the task as completed, even if it failed. If it failed, we will use exponential backoff to keep retrying
+    the task until max number of retries is reached. Once this happens, we cancel the task.
+    
+    :param: error If the task failed, pass an error to indicate why
+    */
     public func completed(error: NSError?) {
         // Check to make sure we're even executing, if not
         // just ignore the completed call
