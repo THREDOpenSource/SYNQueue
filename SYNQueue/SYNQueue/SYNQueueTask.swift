@@ -70,14 +70,14 @@ public class SYNQueueTask : NSOperation {
     
     :returns: A new SYNQueueTask
     */
-    public init(queue: SYNQueue, taskID: String, taskType: String,
+    public init(queue: SYNQueue, taskID: String? = nil, taskType: String,
         dependencyStrs: [String] = [], data: AnyObject? = nil,
         created: NSDate = NSDate(), started: NSDate? = nil, retries: Int = 0,
         queuePriority: NSOperationQueuePriority = .Normal,
         qualityOfService: NSQualityOfService = .Utility)
     {
         self.queue = queue
-        self.taskID = taskID
+        self.taskID = taskID ?? NSUUID().UUIDString
         self.taskType = taskType
         self.dependencyStrs = dependencyStrs
         self.data = data
