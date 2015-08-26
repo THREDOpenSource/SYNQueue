@@ -188,6 +188,8 @@
 		9FD63F891B333BDC001BD09A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftMigration = 0700;
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = Syntertainment;
 				TargetAttributes = {

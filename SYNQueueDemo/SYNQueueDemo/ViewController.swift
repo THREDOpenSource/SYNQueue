@@ -30,8 +30,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         queue.loadSerializedTasks()
         
         let taskIDs = queue.operations
-            .map { return $0 as? SYNQueueTask }
-            .map { return $0?.taskID.toInt() ?? 0 }
+            .map { $0 as? SYNQueueTask }
+            .map { $0 != nil ? Int($0!.taskID) ?? 0 : 0 } // For some reason the failable initializer for Int() confuses the type system so we have to explicitly check for nil
         nextTaskID = (arrayMax(taskIDs) ?? 0) + 1
     }
     
@@ -59,12 +59,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 //        })
         
         // Redraw this task to show it as active
-        if let index = findIndex(queue.operations as! [NSOperation], task) {
-            runOnMainThread {
-                let path = NSIndexPath(forItem: index, inSection: 0)
-                self.collectionView.reloadData()
-            }
-        }
+        runOnMainThread { self.collectionView.reloadData() }
     }
     
     func taskComplete(error: NSError?, _ task: SYNQueueTask) {
