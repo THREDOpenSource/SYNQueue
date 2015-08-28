@@ -21,11 +21,9 @@ func synced(lock: AnyObject, closure: () -> ()) {
 
 func toJSON(obj: AnyObject) -> String? {
     var err: NSError?
-    do {
-        let json = try NSJSONSerialization.dataWithJSONObject(obj, options: [])
+    if let json = NSJSONSerialization.dataWithJSONObject(obj, options: .allZeros, error: &err) {
         return NSString(data: json, encoding: NSUTF8StringEncoding) as String?
-    } catch let error as NSError {
-        err = error
+    } else {
         // TODO: Change this method to throw NSError in Swift 2.0
         //let error = err?.description ?? "nil"
         return nil
@@ -35,11 +33,9 @@ func toJSON(obj: AnyObject) -> String? {
 func fromJSON(str: String) -> AnyObject? {
     if let json = str.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) {
         var err: NSError?
-        do {
-            let obj: AnyObject = try NSJSONSerialization.JSONObjectWithData(json, options: .AllowFragments)
+        if let obj: AnyObject = NSJSONSerialization.JSONObjectWithData(json, options: .AllowFragments, error: &err) {
             return obj
-        } catch let error as NSError {
-            err = error
+        } else {
             // TODO: Change this method to throw NSError in Swift 2.0
             //let error = err?.description ?? "nil"
         }

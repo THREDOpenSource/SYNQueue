@@ -17,7 +17,7 @@ class ISOFormatter : NSDateFormatter {
         self.locale = NSLocale(localeIdentifier: "en_US_POSIX")
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
 }
@@ -40,7 +40,7 @@ extension NSDate {
             return formatter
         } else {
             let formatter = ISOFormatter()
-            objc_setAssociatedObject(self, "formatter", formatter, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, "formatter", formatter, UInt(OBJC_ASSOCIATION_RETAIN))
             return formatter
         }
     }

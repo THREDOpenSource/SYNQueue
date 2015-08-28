@@ -30,8 +30,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         queue.loadSerializedTasks()
         
         let taskIDs = queue.operations
-            .map { $0 as? SYNQueueTask }
-            .map { $0 != nil ? Int($0!.taskID) ?? 0 : 0 } // For some reason the failable initializer for Int() confuses the type system so we have to explicitly check for nil
+            .map { return $0 as? SYNQueueTask }
+            .map { return $0?.taskID.toInt() ?? 0 }
         nextTaskID = (arrayMax(taskIDs) ?? 0) + 1
     }
     
@@ -49,24 +49,22 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     func taskHandler(task: SYNQueueTask) {
         // NOTE: Tasks are not actually handled here like usual since task
-        // completion in this example is based on user interaction, unless
-        // we enable the setting for task autocompletion
-        
+        // completion in this example is based on user interaction
         log(.Info, "Running task \(task.taskID)")
         
-        // Do something with data and call task.completed() when done
-        // let data = task.data
+        // FIXME: This needs to be a toggle option in the UI
+        // Set task completion after 5 seconds
+//        Utils.runOnMainThreadAfterDelay(5, callback: { () -> () in
+//            task.completed(nil)
+//        })
         
-        // Here, for example, we just auto complete the task
-        let taskShouldAutocomplete = NSUserDefaults.standardUserDefaults().boolForKey(kAutocompleteTaskSettingKey)
-        if taskShouldAutocomplete {
-            // Set task completion after 3 seconds
-            runOnMainThreadAfterDelay(3, callback: { () -> () in
-                task.completed(nil)
-            })
+        // Redraw this task to show it as active
+        if let index = findIndex(queue.operations as! [NSOperation], task) {
+            runOnMainThread {
+                let path = NSIndexPath(forItem: index, inSection: 0)
+                self.collectionView.reloadData()
+            }
         }
-        
-        runOnMainThread { self.collectionView.reloadData() }
     }
     
     func taskComplete(error: NSError?, _ task: SYNQueueTask) {
@@ -104,16 +102,14 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         if let task = queue.operations[indexPath.item] as? SYNQueueTask {
             cell.task = task
             cell.nameLabel.text = "task \(task.taskID)"
-            let taskShouldAutocomplete = NSUserDefaults.standardUserDefaults().boolForKey(kAutocompleteTaskSettingKey)
-            
             if task.executing {
                 cell.backgroundColor = UIColor.blueColor()
-                cell.failButton.hidden = taskShouldAutocomplete
-                cell.succeedButton.hidden = taskShouldAutocomplete
+                cell.failButton.enabled = true
+                cell.succeedButton.enabled = true
             } else {
                 cell.backgroundColor = UIColor.grayColor()
-                cell.succeedButton.hidden = true
-                cell.failButton.hidden = true
+                cell.succeedButton.enabled = false
+                cell.failButton.enabled = false
             }
         }
         
@@ -122,23 +118,19 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     // MARK: - IBActions
     
-    @IBAction func addTapped(sender: UIBarButtonItem) {
+    @IBAction func addTapped(sender: UIButton) {
         let taskID1 = nextTaskID++
+        let taskID2 = nextTaskID++
         let task1 = SYNQueueTask(queue: queue, taskID: String(taskID1),
             taskType: "cellTask", dependencyStrs: [], data: [:])
+        let task2 = SYNQueueTask(queue: queue, taskID: String(taskID2),
+            taskType: "cellTask", dependencyStrs: [], data: [:])
         
-        let shouldAddDependency = NSUserDefaults.standardUserDefaults().boolForKey(kAddDependencySettingKey)
-        if shouldAddDependency {
-            let taskID2 = nextTaskID++
-            let task2 = SYNQueueTask(queue: queue, taskID: String(taskID2),
-                taskType: "cellTask", dependencyStrs: [], data: [:])
-
-            // Make the first task dependent on the second
-            task1.addDependency(task2)
-            queue.addOperation(task2)
-        }
+        // Make the first task dependent on the second
+        task1.addDependency(task2)
         
         queue.addOperation(task1)
+        queue.addOperation(task2)
         
         totalTasksSeen = max(totalTasksSeen, queue.operationCount)
         updateProgress()
@@ -146,7 +138,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         collectionView.reloadData()
     }
     
-    @IBAction func removeTapped(sender: UIBarButtonItem) {
+    @IBAction func removeTapped(sender: UIButton) {
         // Find the first task in the list
         if let task = queue.operations.first as? SYNQueueTask {
             log(.Info, "Removing task \(task.taskID)")
@@ -163,6 +155,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         let tasks = queue.tasks
         let progress = Double(totalTasksSeen - tasks.count) / Double(totalTasksSeen)
         
-        runOnMainThread { self.progressView .setProgress(tasks.count == 0 ? 0 : Float(progress), animated: true) }
+        runOnMainThread { self.progressView.progress = Float(progress) }
     }
 }
