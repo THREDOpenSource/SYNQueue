@@ -85,14 +85,14 @@ public class SYNQueue : NSOperationQueue {
     /**
     Initializes a SYNQueue with the provided options
     
-    :param: queueName             The name of the queue
-    :param: maxConcurrency        The maximum number of tasks to run in parallel
-    :param: maxRetries            The maximum times a task will be retried if it fails
-    :param: logProvider           An optional logger, nothing will be logged if this is nil
-    :param: serializationProvider An optional serializer, there will be no serialzation (persistence) if nil
-    :param: completionBlock       The closure to call when a task finishes
+    - parameter queueName:             The name of the queue
+    - parameter maxConcurrency:        The maximum number of tasks to run in parallel
+    - parameter maxRetries:            The maximum times a task will be retried if it fails
+    - parameter logProvider:           An optional logger, nothing will be logged if this is nil
+    - parameter serializationProvider: An optional serializer, there will be no serialzation (persistence) if nil
+    - parameter completionBlock:       The closure to call when a task finishes
     
-    :returns: A new SYNQueue
+    - returns: A new SYNQueue
     */
     public required init(queueName: String, maxConcurrency: Int = 1, maxRetries: Int = 5,
         logProvider: SYNQueueLogProvider? = nil,
@@ -113,8 +113,8 @@ public class SYNQueue : NSOperationQueue {
     /**
     Add a handler for a task type
     
-    :param: taskType    The task type for the handler
-    :param: taskHandler The handler for this particular task type, must be generic for the task type
+    - parameter taskType:    The task type for the handler
+    - parameter taskHandler: The handler for this particular task type, must be generic for the task type
     */
     public func addTaskHandler(taskType: String, taskHandler:SYNTaskCallback) {
         taskHandlers[taskType] = taskHandler
@@ -141,7 +141,7 @@ public class SYNQueue : NSOperationQueue {
     /**
     Adds a SYNQueueTask to the queue and serializes it
     
-    :param: op A SYNQueueTask to execute on the queue
+    - parameter op: A SYNQueueTask to execute on the queue
     */
     override public func addOperation(op: NSOperation) {
         if let task = op as? SYNQueueTask {

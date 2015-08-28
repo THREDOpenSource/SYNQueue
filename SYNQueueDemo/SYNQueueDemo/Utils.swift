@@ -13,8 +13,8 @@ func arrayMax<T: Comparable>(array: [T]) -> T? {
     return array.reduce(array.first) { return $0 > $1 ? $0 : $1 }
 }
 
-func findIndex<T: Equatable>(array: [T], valueToFind: T) -> Int? {
-    for (index, value) in enumerate(array) {
+func findIndex<T: Equatable>(array: [T], _ valueToFind: T) -> Int? {
+    for (index, value) in array.enumerate() {
         if value == valueToFind {
             return index
         }
