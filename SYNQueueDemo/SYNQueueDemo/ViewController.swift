@@ -125,13 +125,14 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             taskType: "cellTask", dependencyStrs: [], data: [:])
         let task2 = SYNQueueTask(queue: queue, taskID: String(taskID2),
             taskType: "cellTask", dependencyStrs: [], data: [:])
+        let task3 = SYNQueueTask(queue: queue, type: "cellTask")
         
         // Make the first task dependent on the second
         task1.addDependency(task2)
         
         queue.addOperation(task1)
         queue.addOperation(task2)
-        
+        queue.addOperation(task3)
         totalTasksSeen = max(totalTasksSeen, queue.operationCount)
         updateProgress()
         

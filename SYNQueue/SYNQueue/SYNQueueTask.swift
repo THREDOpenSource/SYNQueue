@@ -91,6 +91,10 @@ public class SYNQueueTask : NSOperation {
         self.qualityOfService = qualityOfService
     }
     
+    public convenience init(queue: SYNQueue, type: String) {
+        self.init(queue: queue, taskType: type)
+    }
+    
     /**
     Initializes a SYNQueueTask from a dictionary
     
