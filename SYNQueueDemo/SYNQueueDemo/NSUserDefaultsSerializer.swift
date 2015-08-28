@@ -9,16 +9,16 @@
 import Foundation
 import SYNQueue
 
-
+@objc
 class NSUserDefaultsSerializer : SYNQueueSerializationProvider {
     // MARK: - SYNQueueSerializationProvider Methods
     
-    @objc func serializeTask(task: SYNQueueTask, queueName: String) {
+    func serializeTask(task: SYNQueueTask, queueName: String) {
         if let serialized = task.toJSONString() {
             let defaults = NSUserDefaults.standardUserDefaults()
             var stringArray: [String]
             
-            if let curStringArray = defaults.stringArrayForKey(queueName) {
+            if let curStringArray = defaults.stringArrayForKey(queueName) as? [String] {
                 stringArray = curStringArray
                 stringArray.append(serialized)
             } else {
@@ -31,18 +31,21 @@ class NSUserDefaultsSerializer : SYNQueueSerializationProvider {
         }
     }
     
-    @objc func deserializeTasksInQueue(queue: SYNQueue) -> [SYNQueueTask] {
+    func deserializeTasksInQueue(queue: SYNQueue) -> [SYNQueueTask] {
         let defaults = NSUserDefaults.standardUserDefaults()
-        guard let queueName = queue.name, let stringArray = defaults.stringArrayForKey(queueName) else {
-            return []
+        if  let queueName = queue.name,
+            let stringArray = defaults.stringArrayForKey(queueName) as? [String]
+        {
+            return stringArray
+                .map { return SYNQueueTask(json: $0, queue: queue) }
+                .filter { return $0 != nil }
+                .map { return $0! }
         }
-        return stringArray
-            .map { return SYNQueueTask(json: $0, queue: queue) }
-            .filter { return $0 != nil }
-            .map { return $0! }
+        
+        return []
     }
     
-    @objc func removeTask(taskID: String, queue: SYNQueue) {
+    func removeTask(taskID: String, queue: SYNQueue) {
         if let queueName = queue.name {
             var curArray: [SYNQueueTask] = deserializeTasksInQueue(queue)
             curArray = curArray.filter { return $0.taskID != taskID }
