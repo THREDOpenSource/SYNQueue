@@ -43,7 +43,11 @@ let queue = SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 3,
             completionBlock: { [weak self] in self?.taskComplete($0, $1) })
 ```
 
->The `logProvider` and `serializationProvider` must conform to the `SYNQueueLogProvider` and `SYNQueueSerializationProvider` protocols respectively. The `completionBlock` is the block to run when a task in the queue completes (success or failure).
+>The `logProvider` and `serializationProvider` must conform to the `SYNQueueLogProvider` and `SYNQueueSerializationProvider` protocols respectively. 
+>
+>See [NSUserDefaultsSerializer.swift](SYNQueueDemo/SYNQueueDemo/NSUserDefaultsSerializer.swift) and [ConsoleLogger.swift](SYNQueueDemo/SYNQueueDemo/ConsoleLogger.swift) for example implementations.
+>
+>The `completionBlock` is the block to run when a task in the queue completes (success or failure).
 
 ###Create a task
 ```swift
