@@ -1,8 +1,12 @@
-# `SYNQueue`
-
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
-
-*A simple yet powerful queueing system for iOS (with persistence).*
+<div align="center">
+<img src="image/logo.png?raw=true"></img>
+<br>
+<br>
+<em>A simple yet powerful queueing system for iOS (with persistence).</em>
+<br>
+<br>
+<img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat">
+</div>
 
 ##Overview
 
