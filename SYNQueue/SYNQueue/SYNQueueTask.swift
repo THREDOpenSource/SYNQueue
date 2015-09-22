@@ -56,19 +56,19 @@ public class SYNQueueTask : NSOperation {
     /**
     Initializes a new SYNQueueTask with the following options
     
-    :param: queue            The queue that will execute the task
-    :param: taskID           A unique identifier for the task, must be unique across app terminations, 
+    - parameter queue:            The queue that will execute the task
+    - parameter taskID:           A unique identifier for the task, must be unique across app terminations, 
                              otherwise dependencies will not work correctly
-    :param: taskType         A type that will be used to group tasks together, tasks have to generic with respect to their type
-    :param: dependencyStrs   Identifiers for tasks that are dependencies of this task
-    :param: data             The data that the task needs to operate on
-    :param: created          When the task was created
-    :param: started          When the task started executing
-    :param: retries          Number of times this task has been retried after failing
-    :param: queuePriority    The priority
-    :param: qualityOfService The quality of service
+    - parameter taskType:         A type that will be used to group tasks together, tasks have to generic with respect to their type
+    - parameter dependencyStrs:   Identifiers for tasks that are dependencies of this task
+    - parameter data:             The data that the task needs to operate on
+    - parameter created:          When the task was created
+    - parameter started:          When the task started executing
+    - parameter retries:          Number of times this task has been retried after failing
+    - parameter queuePriority:    The priority
+    - parameter qualityOfService: The quality of service
     
-    :returns: A new SYNQueueTask
+    - returns: A new SYNQueueTask
     */
     public init(queue: SYNQueue, taskID: String? = nil, taskType: String,
         dependencyStrs: [String] = [], data: AnyObject? = nil,
@@ -98,10 +98,10 @@ public class SYNQueueTask : NSOperation {
     /**
     Initializes a SYNQueueTask from a dictionary
     
-    :param: dictionary A dictionary that contains the data to reconstruct a task
-    :param: queue      The queue that the task will execute on
+    - parameter dictionary: A dictionary that contains the data to reconstruct a task
+    - parameter queue:      The queue that the task will execute on
 
-    :returns: A new SYNQueueTask
+    - returns: A new SYNQueueTask
     */
     public convenience init?(dictionary: JSONDictionary, queue: SYNQueue) {
         if  let taskID = dictionary["taskID"] as? String,
@@ -132,16 +132,19 @@ public class SYNQueueTask : NSOperation {
     /**
     Initializes a SYNQueueTask from JSON
     
-    :param: json    JSON from which the reconstruct the task
-    :param: queue   The queue that the task will execute on
+    - parameter json:    JSON from which the reconstruct the task
+    - parameter queue:   The queue that the task will execute on
     
-    :returns: A new SYNQueueTask
+    - returns: A new SYNQueueTask
     */
     public convenience init?(json: String, queue: SYNQueue) {
-        if let dict = fromJSON(json) as? [String: AnyObject] {
-            self.init(dictionary: dict, queue: queue)
-        } else {
-            self.init(queue: queue, taskID: "", taskType: "")
+        do {
+            if let dict = try fromJSON(json) as? [String: AnyObject] {
+                self.init(dictionary: dict, queue: queue)
+            } else {
+                return nil
+            }
+        } catch {
             return nil
         }
     }
@@ -149,10 +152,10 @@ public class SYNQueueTask : NSOperation {
     /**
     Setup the dependencies for the task
     
-    :param: allTasks Array of SYNQueueTasks that are dependencies of this task
+    - parameter allTasks: Array of SYNQueueTasks that are dependencies of this task
     */
     public func setupDependencies(allTasks: [SYNQueueTask]) {
-        dependencyStrs.map {
+        dependencyStrs.forEach {
             (taskID: String) -> Void in
             
             let found = allTasks.filter({ taskID == $0.name })
@@ -168,7 +171,7 @@ public class SYNQueueTask : NSOperation {
     /**
     Deconstruct the task to a dictionary, used to serialize the task
     
-    :returns: A Dictionary representation of the task
+    - returns: A Dictionary representation of the task
     */
     public func toDictionary() -> [String: AnyObject?] {
         var dict = [String: AnyObject?]()
@@ -188,7 +191,7 @@ public class SYNQueueTask : NSOperation {
     /**
     Deconstruct the task to a JSON string, used to serialize the task
     
-    :returns: A JSON string representation of the task
+    - returns: A JSON string representation of the task
     */
     public func toJSONString() -> String? {
         // Serialize this task to a dictionary
@@ -196,12 +199,17 @@ public class SYNQueueTask : NSOperation {
         
         // Convert the dictionary to an NSDictionary by replacing nil values
         // with NSNull
-        var nsdict = NSMutableDictionary(capacity: dict.count)
+        let nsdict = NSMutableDictionary(capacity: dict.count)
         for (key, value) in dict {
             nsdict[key] = value ?? NSNull()
         }
         
-        return toJSON(nsdict)
+        do {
+            let json = try toJSON(nsdict)
+            return json
+        } catch {
+            return nil
+        }
     }
     
     /**
@@ -237,7 +245,7 @@ public class SYNQueueTask : NSOperation {
     Call this to mark the task as completed, even if it failed. If it failed, we will use exponential backoff to keep retrying
     the task until max number of retries is reached. Once this happens, we cancel the task.
     
-    :param: error If the task failed, pass an error to indicate why
+    - parameter error: If the task failed, pass an error to indicate why
     */
     public func completed(error: NSError?) {
         // Check to make sure we're even executing, if not

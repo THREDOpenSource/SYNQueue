@@ -30,8 +30,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         queue.loadSerializedTasks()
         
         let taskIDs = queue.operations
-            .map { return $0 as? SYNQueueTask }
-            .map { return $0?.taskID.toInt() ?? 0 }
+            .map { return $0 as! SYNQueueTask }
+            .map { return Int($0.taskID) ?? 0 }
         nextTaskID = (arrayMax(taskIDs) ?? 0) + 1
     }
     
@@ -52,18 +52,9 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         // completion in this example is based on user interaction
         log(.Info, "Running task \(task.taskID)")
         
-        // FIXME: This needs to be a toggle option in the UI
-        // Set task completion after 5 seconds
-//        Utils.runOnMainThreadAfterDelay(5, callback: { () -> () in
-//            task.completed(nil)
-//        })
-        
         // Redraw this task to show it as active
-        if let index = findIndex(queue.operations as! [NSOperation], task) {
-            runOnMainThread {
-                let path = NSIndexPath(forItem: index, inSection: 0)
-                self.collectionView.reloadData()
-            }
+        runOnMainThread() {
+            self.collectionView.reloadData()
         }
     }
     
