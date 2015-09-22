@@ -26,7 +26,7 @@ func runOnMainThread(callback:dispatch_block_t) {
     dispatch_async(dispatch_get_main_queue(), callback)
 }
 
-func runOnMainThreadAfterDelay(delay:Double, callback:()->()) {
+func runOnMainThreadAfterDelay(delay:Double, _ callback:()->()) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), { () -> Void in
         callback()
     })

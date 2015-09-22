@@ -49,13 +49,25 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     func taskHandler(task: SYNQueueTask) {
         // NOTE: Tasks are not actually handled here like usual since task
-        // completion in this example is based on user interaction
+        // completion in this example is based on user interaction, unless
+        // we enable the setting for task autocompletion
+        
         log(.Info, "Running task \(task.taskID)")
         
-        // Redraw this task to show it as active
-        runOnMainThread() {
-            self.collectionView.reloadData()
+        // Do something with data and call task.completed() when done
+        // let data = task.data
+        
+        // Here, for example, we just auto complete the task
+        let taskShouldAutocomplete = NSUserDefaults.standardUserDefaults().boolForKey(kAutocompleteTaskSettingKey)
+        if taskShouldAutocomplete {
+            // Set task completion after 3 seconds
+            runOnMainThreadAfterDelay(3, { () -> () in
+                task.completed(nil)
+            })
         }
+        
+        runOnMainThread { self.collectionView.reloadData() }
+
     }
     
     func taskComplete(error: NSError?, _ task: SYNQueueTask) {
@@ -93,7 +105,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         if let task = queue.operations[indexPath.item] as? SYNQueueTask {
             cell.task = task
             cell.nameLabel.text = "task \(task.taskID)"
-            if task.executing {
+            let taskShouldAutocomplete = NSUserDefaults.standardUserDefaults().boolForKey(kAutocompleteTaskSettingKey)
+            if task.executing && !taskShouldAutocomplete {
                 cell.backgroundColor = UIColor.blueColor()
                 cell.failButton.enabled = true
                 cell.succeedButton.enabled = true
@@ -111,19 +124,21 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     @IBAction func addTapped(sender: UIButton) {
         let taskID1 = nextTaskID++
-        let taskID2 = nextTaskID++
         let task1 = SYNQueueTask(queue: queue, taskID: String(taskID1),
             taskType: "cellTask", dependencyStrs: [], data: [:])
-        let task2 = SYNQueueTask(queue: queue, taskID: String(taskID2),
-            taskType: "cellTask", dependencyStrs: [], data: [:])
-        let task3 = SYNQueueTask(queue: queue, type: "cellTask")
         
-        // Make the first task dependent on the second
-        task1.addDependency(task2)
+        let shouldAddDependency = NSUserDefaults.standardUserDefaults().boolForKey(kAddDependencySettingKey)
+        if shouldAddDependency {
+            let taskID2 = nextTaskID++
+            let task2 = SYNQueueTask(queue: queue, taskID: String(taskID2),
+                taskType: "cellTask", dependencyStrs: [], data: [:])
+            
+            // Make the first task dependent on the second
+            task1.addDependency(task2)
+            queue.addOperation(task2)
+        }
         
         queue.addOperation(task1)
-        queue.addOperation(task2)
-        queue.addOperation(task3)
         totalTasksSeen = max(totalTasksSeen, queue.operationCount)
         updateProgress()
         
