@@ -56,7 +56,7 @@ public class SYNQueueTask : NSOperation {
     - parameter queue:            The queue that will execute the task
     - parameter taskID:           A unique identifier for the task, must be unique across app terminations, 
                              otherwise dependencies will not work correctly
-    - parameter taskType:         A type that will be used to group tasks together, tasks have to generic with respect to their type
+    - parameter taskType:         A type that will be used to group tasks together, tasks have to be generic with respect to their type
     - parameter dependencyStrs:   Identifiers for tasks that are dependencies of this task
     - parameter data:             The data that the task needs to operate on
     - parameter created:          When the task was created
@@ -67,7 +67,7 @@ public class SYNQueueTask : NSOperation {
     
     - returns: A new SYNQueueTask
     */
-    public init(queue: SYNQueue, taskID: String? = nil, taskType: String,
+    private init(queue: SYNQueue, taskID: String? = nil, taskType: String,
         dependencyStrs: [String] = [], data: AnyObject? = nil,
         created: NSDate = NSDate(), started: NSDate? = nil, retries: Int = 0,
         queuePriority: NSOperationQueuePriority = .Normal,
@@ -88,8 +88,26 @@ public class SYNQueueTask : NSOperation {
         self.qualityOfService = qualityOfService
     }
     
-    public convenience init(queue: SYNQueue, type: String) {
-        self.init(queue: queue, taskType: type)
+    /**
+    Initializes a new SYNQueueTask with the following options
+    
+    - parameter queue:            The queue that will execute the task
+    - parameter taskType:         A type that will be used to group tasks together, tasks have to be generic with respect to their type
+    - parameter data:             The data that the task needs to operate on
+    - parameter retries:          Number of times this task has been retried after failing
+    - parameter queuePriority:    The priority
+    - parameter qualityOfService: The quality of service
+    
+    - returns: A new SYNQueueTask
+    */
+    public convenience init(queue: SYNQueue, type: String, data: AnyObject? = nil, retries: Int = 0, priority: NSOperationQueuePriority = .Normal, quality: NSQualityOfService = .Utility) {
+        self.init(queue: queue, taskType: type, data: data, retries: retries, queuePriority: priority, qualityOfService: quality)
+    }
+    
+    // For objective-c compatibility of convenience initializer
+    // See: http://sidhantgandhi.com/swift-default-parameter-values-in-convenience-initializers/
+    public convenience init(queue: SYNQueue, taskType: String) {
+        self.init(queue: queue, type: taskType)
     }
     
     /**
