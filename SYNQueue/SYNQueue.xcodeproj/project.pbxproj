@@ -8,12 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		9F6202311B333AAF0026CE2C /* SYNQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F6202301B333AAF0026CE2C /* SYNQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9F6202371B333AAF0026CE2C /* SYNQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F62022B1B333AAF0026CE2C /* SYNQueue.framework */; };
 		9F62023E1B333AAF0026CE2C /* SYNQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F62023D1B333AAF0026CE2C /* SYNQueueTests.swift */; };
 		9FD63F871B333B81001BD09A /* SYNQueueTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63F861B333B81001BD09A /* SYNQueueTask.swift */; };
-		9FD63FBD1B3342C6001BD09A /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63FBC1B3342C6001BD09A /* Utils.swift */; };
 		9FD63FBF1B334316001BD09A /* NSDate+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63FBE1B334316001BD09A /* NSDate+Utils.swift */; };
 		9FD63FC11B335579001BD09A /* SYNQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD63FC01B335579001BD09A /* SYNQueue.swift */; };
+		DCD110DA1BBA166B003AF0F0 /* ConsoleLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD110D81BBA166B003AF0F0 /* ConsoleLogger.swift */; settings = {ASSET_TAGS = (); }; };
+		DCD110DB1BBA166B003AF0F0 /* NSUserDefaultsSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD110D91BBA166B003AF0F0 /* NSUserDefaultsSerializer.swift */; settings = {ASSET_TAGS = (); }; };
+		DCD110E01BBA2F1E003AF0F0 /* SYNQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F62022B1B333AAF0026CE2C /* SYNQueue.framework */; };
+		DCD110E21BBA2FB0003AF0F0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD110E11BBA2FB0003AF0F0 /* Utils.swift */; settings = {ASSET_TAGS = (); }; };
+		DCD110E31BBA2FBC003AF0F0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD110E11BBA2FB0003AF0F0 /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,9 +37,11 @@
 		9F62023C1B333AAF0026CE2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9F62023D1B333AAF0026CE2C /* SYNQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SYNQueueTests.swift; sourceTree = "<group>"; };
 		9FD63F861B333B81001BD09A /* SYNQueueTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SYNQueueTask.swift; sourceTree = "<group>"; };
-		9FD63FBC1B3342C6001BD09A /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		9FD63FBE1B334316001BD09A /* NSDate+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+Utils.swift"; sourceTree = "<group>"; };
 		9FD63FC01B335579001BD09A /* SYNQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SYNQueue.swift; sourceTree = "<group>"; };
+		DCD110D81BBA166B003AF0F0 /* ConsoleLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleLogger.swift; sourceTree = "<group>"; };
+		DCD110D91BBA166B003AF0F0 /* NSUserDefaultsSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSUserDefaultsSerializer.swift; sourceTree = "<group>"; };
+		DCD110E11BBA2FB0003AF0F0 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,7 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F6202371B333AAF0026CE2C /* SYNQueue.framework in Frameworks */,
+				DCD110E01BBA2F1E003AF0F0 /* SYNQueue.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,7 +89,7 @@
 				9F6202301B333AAF0026CE2C /* SYNQueue.h */,
 				9FD63FC01B335579001BD09A /* SYNQueue.swift */,
 				9FD63F861B333B81001BD09A /* SYNQueueTask.swift */,
-				9FD63FBC1B3342C6001BD09A /* Utils.swift */,
+				DCD110E11BBA2FB0003AF0F0 /* Utils.swift */,
 			);
 			path = SYNQueue;
 			sourceTree = "<group>";
@@ -109,6 +114,8 @@
 		9F62023B1B333AAF0026CE2C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				DCD110D81BBA166B003AF0F0 /* ConsoleLogger.swift */,
+				DCD110D91BBA166B003AF0F0 /* NSUserDefaultsSerializer.swift */,
 				9F62023C1B333AAF0026CE2C /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -226,7 +233,7 @@
 				9FD63FC11B335579001BD09A /* SYNQueue.swift in Sources */,
 				9FD63F871B333B81001BD09A /* SYNQueueTask.swift in Sources */,
 				9FD63FBF1B334316001BD09A /* NSDate+Utils.swift in Sources */,
-				9FD63FBD1B3342C6001BD09A /* Utils.swift in Sources */,
+				DCD110E21BBA2FB0003AF0F0 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,6 +241,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCD110E31BBA2FBC003AF0F0 /* Utils.swift in Sources */,
+				DCD110DB1BBA166B003AF0F0 /* NSUserDefaultsSerializer.swift in Sources */,
+				DCD110DA1BBA166B003AF0F0 /* ConsoleLogger.swift in Sources */,
 				9F62023E1B333AAF0026CE2C /* SYNQueueTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -347,6 +357,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_TESTABILITY = YES;
 				INFOPLIST_FILE = SYNQueue/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -366,6 +377,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_TESTABILITY = YES;
 				INFOPLIST_FILE = SYNQueue/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -378,10 +390,7 @@
 		9F6202451B333AAF0026CE2C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
+				ENABLE_TESTABILITY = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -395,10 +404,7 @@
 		9F6202461B333AAF0026CE2C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
+				ENABLE_TESTABILITY = NO;
 				INFOPLIST_FILE = SYNQueueTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";

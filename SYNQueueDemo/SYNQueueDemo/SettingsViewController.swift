@@ -2,9 +2,6 @@
 //  SettingsViewController.swift
 //  SYNQueueDemo
 //
-//  Created by Sidhant Gandhi on 8/25/15.
-//  Copyright (c) 2015 Syntertainment. All rights reserved.
-//
 
 import UIKit
 
