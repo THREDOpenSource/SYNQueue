@@ -107,6 +107,32 @@ class SYNQueueTests: XCTestCase {
             queue.addOperation(task)
         }
     }
+    
+    func testInternetDependency() {
+        let name = randomQueueName()
+        
+        let queue = SYNQueue(queueName: name, maxConcurrency: 3, maxRetries: 2, logProvider: logger, serializationProvider: serializer) { (error: NSError?, task: SYNQueueTask) -> Void in
+            //
+        }
+        
+        queue.addTaskHandler(testTaskType) {
+            NSThread.sleepForTimeInterval(1)
+            $0.completed(nil)
+        }
+        
+        queue.addTaskHandler("internetDependencyType") { task in
+            let reachability = Reachability.reachabilityForInternetConnection()
+            reachability?.whenReachable = { reachability in
+                task.completed(nil)
+            }
+        }
+        
+        let task = SYNQueueTask(queue: queue, taskType: testTaskType)
+        let internetDependency = SYNQueueTask(queue: queue, type: "internetDependencyType", retries: 0)
+        task.addDependency(internetDependency)
+        queue.addOperation(task)
+        
+    }
 }
 
 // MARK: Helper methods
