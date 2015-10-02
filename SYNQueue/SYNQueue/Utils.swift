@@ -2,9 +2,6 @@
 //  Utils.swift
 //  SYNQueue
 //
-//  Created by John Hurliman on 6/18/15.
-//  Copyright (c) 2015 Syntertainment. All rights reserved.
-//
 
 import Foundation
 
@@ -17,6 +14,10 @@ func synced(lock: AnyObject, closure: () -> ()) {
     objc_sync_enter(lock)
     closure()
     objc_sync_exit(lock)
+}
+
+func runOnMainThread(callback:dispatch_block_t) {
+    dispatch_async(dispatch_get_main_queue(), callback)
 }
 
 func toJSON(obj: AnyObject) throws -> String? {

@@ -5,7 +5,8 @@
 <em>A simple yet powerful queueing system for iOS (with persistence).</em>
 <br>
 <br>
-<img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat">
+<img title="Carthage compatible" src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat">
+<img title="Build status" src="https://travis-ci.org/THREDOpenSource/SYNQueue.svg">
 </div>
 
 ##Overview
