@@ -59,7 +59,7 @@ let queue = SYNQueue(queueName: "myQueue", maxConcurrency: 2, maxRetries: 3,
 let t1 = SYNQueueTask(queue: queue, taskID: "1234", taskType: "uploadPhoto", dependencyStrs: [], data: [:])
 ```
 
->The `queue` is the queue you will add the task to. `taskID` is a unique ID for the task. `taskType` is the generic type of task to perform. Each `taskType` will have its own `taskHandler`. `data` is any metadata your task will need to perform its job.
+>The `queue` is the queue you will add the task to. `taskID` is a unique ID for the task. `taskType` is the generic type of task to perform. Each `taskType` will have its own `taskHandler`. `data` is any data your task will need to perform its job.
 
 ###Add dependencies
 ```swift
